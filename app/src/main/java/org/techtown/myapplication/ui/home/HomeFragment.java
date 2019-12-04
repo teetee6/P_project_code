@@ -1,35 +1,78 @@
 package org.techtown.myapplication.ui.home;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import org.techtown.myapplication.BookAdapter;
+import org.techtown.myapplication.BookItem;
 import org.techtown.myapplication.R;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
+    private BookAdapter mBookAdapter;
+    private List<BookItem> mBookArray;
+    private LinearLayoutManager layoutManager;
+    RecyclerView rViewKorean;
+    Button btn2;
+    static View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(this, new Observer<String>() {
+        root = inflater.inflate(R.layout.fragment_home, container, false);
+        rViewKorean = (RecyclerView) root.findViewById(R.id.rViewKorean);
+        btn2 = (Button) root.findViewById(R.id.btn2);
+
+        dataInit();
+
+        return root;
+    }
+
+    private void dataInit(){
+
+        mBookArray = new ArrayList<BookItem>();
+
+        for(int i=0;i<=5;i++){
+            BookItem item = new BookItem();
+            item.setName("안"); //insert book title
+            //item.setImgSrc(); //insert book image src
+
+            mBookArray.add(item);
+        }
+
+        layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rViewKorean.setLayoutManager(layoutManager);
+        mBookAdapter = new BookAdapter(mBookArray);
+
+        rViewKorean.setAdapter(mBookAdapter);
+        rViewKorean.setItemAnimator(new DefaultItemAnimator());
+
+        mBookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener(){
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onItemClick(BookAdapter.ViewHolder holder, View view, int position) {
+                BookItem item = BookAdapter.getItem(position);
+                CardView cv = (CardView) view.findViewById(R.id.cView1);
             }
         });
-        return root;
     }
 }
