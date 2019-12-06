@@ -8,28 +8,66 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import org.techtown.myapplication.BookAdapter;
+import org.techtown.myapplication.BookItem;
 import org.techtown.myapplication.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private BookAdapter mBookAdapter;
+    private List<BookItem> mBookArray;
+    private LinearLayoutManager layoutManager;
+    RecyclerView rViewEnglish;
+    static View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                ViewModelProviders.of(this).get(DashboardViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(this, new Observer<String>() {
+        root = inflater.inflate(R.layout.fragment_dashboard, container, false);
+        rViewEnglish = (RecyclerView) root.findViewById(R.id.rViewEnglish);
+
+        dataInit();
+
+        return root;
+    }
+
+    private void dataInit(){
+
+        mBookArray = new ArrayList<BookItem>();
+
+        for(int i=0;i<3;i++){
+            BookItem item = new BookItem();
+            item.setName("sample"); //insert book title
+            //item.setImgSrc(); //insert book image src
+
+            mBookArray.add(item);
+        }
+
+        layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        rViewEnglish.setLayoutManager(layoutManager);
+        mBookAdapter = new BookAdapter(mBookArray);
+
+        rViewEnglish.setAdapter(mBookAdapter);
+        rViewEnglish.setItemAnimator(new DefaultItemAnimator());
+
+        mBookAdapter.setOnItemClickListener(new BookAdapter.OnItemClickListener(){
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onItemClick(BookAdapter.ViewHolder holder, View view, int position) {
+                BookItem item = BookAdapter.getItem(position);
+                CardView cv = (CardView) view.findViewById(R.id.cView1);
+                //Toast.makeText(getContext(),"position = "+position,Toast.LENGTH_LONG).show();
             }
         });
-        return root;
     }
 }

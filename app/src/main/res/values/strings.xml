@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_Korean">한글 동화</string>
+    <string name="title_English">영어 동화</string>
+    <string name="title_My_Page">마이 페이지</string>
+    <string name="book_title">sample title</string>
 </resources>
