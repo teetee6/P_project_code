@@ -33,14 +33,12 @@ public class HomeFragment extends Fragment {
     private List<BookItem> mBookArray;
     private LinearLayoutManager layoutManager;
     RecyclerView rViewKorean;
-    Button btn2;
     static View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_home, container, false);
         rViewKorean = (RecyclerView) root.findViewById(R.id.rViewKorean);
-        btn2 = (Button) root.findViewById(R.id.btn2);
 
         dataInit();
 
@@ -51,9 +49,9 @@ public class HomeFragment extends Fragment {
 
         mBookArray = new ArrayList<BookItem>();
 
-        for(int i=0;i<=5;i++){
+        for(int i=0;i<3;i++){
             BookItem item = new BookItem();
-            item.setName("안"); //insert book title
+            item.setName("샘플"); //insert book title
             //item.setImgSrc(); //insert book image src
 
             mBookArray.add(item);
@@ -72,6 +70,7 @@ public class HomeFragment extends Fragment {
             public void onItemClick(BookAdapter.ViewHolder holder, View view, int position) {
                 BookItem item = BookAdapter.getItem(position);
                 CardView cv = (CardView) view.findViewById(R.id.cView1);
+                //Toast.makeText(getContext(),"position = "+position,Toast.LENGTH_LONG).show();
             }
         });
     }

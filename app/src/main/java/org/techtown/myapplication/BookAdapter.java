@@ -1,5 +1,6 @@
 package org.techtown.myapplication;
 
+    import android.graphics.Color;
     import android.view.LayoutInflater;
     import android.view.View;
     import android.view.ViewGroup;
@@ -7,16 +8,22 @@ package org.techtown.myapplication;
     import android.widget.ImageButton;
     import android.widget.ImageView;
     import android.widget.TextView;
+    import android.widget.Toast;
 
     import androidx.annotation.NonNull;
     import androidx.cardview.widget.CardView;
     import androidx.recyclerview.widget.RecyclerView;
+
+    import org.techtown.myapplication.ui.home.HomeFragment;
 
     import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     static private List<BookItem> mBookTempArray;
+    static int cur_num;
+    static boolean play = false;
+    static boolean down = false;
 
     public BookAdapter(List<BookItem> BookList){
         mBookTempArray = BookList;
@@ -40,8 +47,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //holder.bookImg.setImageResource(mBookTempArray.get(position).getImgSrc());
-        //holder.tBookTitle.setText(mBookTempArray.get(position).getName());
+        holder.bookImg.setImageResource(R.mipmap.ic_action_crop_original); //img src setting
+        holder.tBookTitle.setText(mBookTempArray.get(position).getName());
+        cur_num=position;
         holder.setOnItemClickListener(listener);
     }
 
@@ -59,7 +67,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public TextView tBookTitle;
         public CardView cView1;
         public ImageView bookImg;
-        public ImageButton btnPlay;
+        public ImageButton btnPlay, btnDown;
 
         OnItemClickListener listener;
 
@@ -69,11 +77,37 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             bookImg = (ImageView) itemView.findViewById(R.id.bookImg);
             cView1 = (CardView) itemView.findViewById(R.id.cView1);
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
+            btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
 
             btnPlay.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
                     //btnPlay click event
+                    if(!play){
+                        btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
+                        play = true;
+                    }
+                    else {
+                        btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
+                        play = false;
+                    }
+                    Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
+                }
+            });
+
+            btnDown.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!down){
+                        btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
+                        cView1.setCardBackgroundColor(Color.GRAY);
+                        cView1.setBackgroundResource(0);
+                        down = true;
+                    }
+                    else{
+                        btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
+                        down = false;
+                    }
                 }
             });
         }
