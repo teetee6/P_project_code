@@ -1,11 +1,13 @@
 package org.techtown.myapplication;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -20,12 +22,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class TTSAPI {
-    static Context ctx;
-    public static void main(String[] args){
+    static View view;
+    public static void main(String[] args, View activity){
         try {
-            String apiId = ctx.getResources().getString(R.string.apiId);
-            String apiKey = ctx.getResources().getString(R.string.apiKey);
-            Log.d("tag",apiId);
+            String apiId = activity.getResources().getString(R.string.apiId);
+            String apiKey = activity.getResources().getString(R.string.apiKey);
+            //Log.d("tag",apiId);
             URL url = new URL("https://api.maum.ai/tts/stream");
             String text = URLEncoder.encode(args[0],"UTF-8");
             HttpURLConnection myConnection = (HttpURLConnection) url.openConnection();

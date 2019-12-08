@@ -1,24 +1,24 @@
 package org.techtown.myapplication;
 
-    import android.graphics.Color;
-    import android.os.AsyncTask;
-    import android.util.Log;
-    import android.view.LayoutInflater;
-    import android.view.View;
-    import android.view.ViewGroup;
-    import android.widget.Button;
-    import android.widget.ImageButton;
-    import android.widget.ImageView;
-    import android.widget.TextView;
-    import android.widget.Toast;
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-    import androidx.annotation.NonNull;
-    import androidx.cardview.widget.CardView;
-    import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
-    import org.techtown.myapplication.ui.home.HomeFragment;
+import org.techtown.myapplication.ui.home.HomeFragment;
 
-    import java.util.List;
+import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
@@ -72,6 +72,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public ImageButton btnPlay, btnDown;
         private ttsTask mttsTask;
         String[] mTextString;
+        View curView;
 
         OnItemClickListener listener;
 
@@ -96,6 +97,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();
                             mttsTask.execute(mTextString);
+                            curView = v;
                         }else{
                             //empty text
                         }
@@ -131,7 +133,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         private class ttsTask extends AsyncTask<String[], Void, String> {
             @Override
             protected String doInBackground(String[]... strings) {
-                TTSAPI.main(mTextString);
+                TTSAPI.main(mTextString, curView);
                 return null;
             }
 

@@ -1,9 +1,7 @@
 package org.techtown.myapplication.ui.home;
 
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.techtown.myapplication.BookAdapter;
 import org.techtown.myapplication.BookItem;
-import org.techtown.myapplication.MainActivity;
 import org.techtown.myapplication.R;
-import org.techtown.myapplication.TTSAPI;
 
 
 import java.util.ArrayList;
