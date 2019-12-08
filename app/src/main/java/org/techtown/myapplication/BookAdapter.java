@@ -1,6 +1,8 @@
 package org.techtown.myapplication;
 
     import android.graphics.Color;
+    import android.os.AsyncTask;
+    import android.util.Log;
     import android.view.LayoutInflater;
     import android.view.View;
     import android.view.ViewGroup;
@@ -68,6 +70,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public CardView cView1;
         public ImageView bookImg;
         public ImageButton btnPlay, btnDown;
+        private ttsTask mttsTask;
+        String[] mTextString;
 
         OnItemClickListener listener;
 
@@ -86,6 +90,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     if(!play){
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                         play = true;
+                        Log.d("tag","hey1");
+                        String text ="1번, 2번";
+                        if(text.length()>0){
+                            mTextString = new String[]{text};
+                            mttsTask = new ttsTask();
+                            mttsTask.execute(mTextString);
+                        }else{
+                            //empty text
+                        }
                     }
                     else {
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
@@ -115,5 +128,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public void setOnItemClickListener(OnItemClickListener listener){
             this.listener = listener;
         }
+        private class ttsTask extends AsyncTask<String[], Void, String> {
+            @Override
+            protected String doInBackground(String[]... strings) {
+                TTSAPI.main(mTextString);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+        }
     }
+
 }
