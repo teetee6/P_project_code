@@ -1,6 +1,7 @@
 package org.techtown.myapplication;
 
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static int cur_num;
     static boolean play = false;
     static boolean down = false;
+    static MediaPlayer audioPlayer;
 
     public BookAdapter(List<BookItem> BookList){
         mBookTempArray = BookList;
@@ -92,7 +94,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                         play = true;
                         Log.d("tag","hey1");
-                        String text ="1번, 2번";
+                        String text ="안녕하세요오오오오오오";
                         if(text.length()>0){
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();
@@ -103,6 +105,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         }
                     }
                     else {
+                        audioPlayer.pause();
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
                         play = false;
                     }
@@ -133,7 +136,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         private class ttsTask extends AsyncTask<String[], Void, String> {
             @Override
             protected String doInBackground(String[]... strings) {
-                TTSAPI.main(mTextString, curView);
+                audioPlayer = TTSAPI.main(mTextString, curView);
                 return null;
             }
 

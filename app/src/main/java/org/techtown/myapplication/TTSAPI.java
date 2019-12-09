@@ -2,10 +2,12 @@ package org.techtown.myapplication;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -22,8 +24,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class TTSAPI {
-    static View view;
-    public static void main(String[] args, View activity){
+    static Boolean play = false;
+    static MediaPlayer audioPlayer;
+    public static MediaPlayer main(String[] args, final View activity){
         try {
             String apiId = activity.getResources().getString(R.string.apiId);
             String apiKey = activity.getResources().getString(R.string.apiKey);
@@ -44,7 +47,6 @@ public class TTSAPI {
             BufferedReader br;
             if(myConnection.getResponseCode() == 200){
                 //success
-
                 InputStream is = myConnection.getInputStream();
                 int read =0;
                 byte[] bytes = new byte[1024];
@@ -64,11 +66,20 @@ public class TTSAPI {
                 }
                 is.close();
                 String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".wav";
-                MediaPlayer audioPlayer = new MediaPlayer();
+                audioPlayer = new MediaPlayer();
                 audioPlayer.setDataSource(path);
                 Log.d("tag",path);
                 audioPlayer.prepare();
                 audioPlayer.start();
+                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        Toast.makeText(activity.getContext(),"play ended", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(activity.getContext(), TTSAPI.class);
+                        play = true;
+                        intent.putExtra("play", play);
+                    }
+                });
             }else{
                 //error
                 br = new BufferedReader(new InputStreamReader(myConnection.getErrorStream()));
@@ -91,5 +102,7 @@ public class TTSAPI {
                 //networking logic should be here
             }
         });
+
+        return audioPlayer;
     }
 }
