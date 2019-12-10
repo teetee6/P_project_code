@@ -93,16 +93,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     if(!play){
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                         play = true;
-                        Log.d("tag","hey1");
-                        String text ="안녕하세요오오오오오오";
-                        if(text.length()>0){
-                            mTextString = new String[]{text};
-                            mttsTask = new ttsTask();
-                            mttsTask.execute(mTextString);
-                            curView = v;
-                        }else{
-                            //empty text
-                        }
                     }
                     else {
                         audioPlayer.pause();
@@ -121,6 +111,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
+                        Log.d("tag","hey1");
+                        String text ="안녕하세요오오오오오오";
+                        if(text.length()>0){
+                            mTextString = new String[]{text};
+                            mttsTask = new ttsTask();
+                            mttsTask.execute(mTextString);
+                            curView = v;
+                        }else{
+                            //empty text
+                        }
                     }
                     else{
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
@@ -133,10 +133,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public void setOnItemClickListener(OnItemClickListener listener){
             this.listener = listener;
         }
+
         private class ttsTask extends AsyncTask<String[], Void, String> {
             @Override
             protected String doInBackground(String[]... strings) {
                 audioPlayer = TTSAPI.main(mTextString, curView);
+                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
+                        play = false;
+                    }
+                });
                 return null;
             }
 
