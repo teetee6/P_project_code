@@ -118,12 +118,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         play = false;
                     }
                     try {
+                        for(int i =0; i<bookData.length; i++) {
                         CustomTask2 customtask2 = new CustomTask2();
-                        customtask2.execute().get();
-                        //sd카드에서 데이터 가져오기
-                        //인자로 넣어주기
-                        //for문
-                        //for문 안에서 무드 별
+
+                            customtask2.execute(bookData[i]).get();
+                            System.out.println(bookData[i]);
+
+                             System.out.println(mood);
+                        }
+                        //                        //sd카드에서 데이터 가져오기
+                        //                        //인자로 넣어주기
+                        //                        //for문
+                        //                        //for문 안에서 무드 별
 
                     }catch (Exception e){
 
@@ -144,7 +150,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         //sd카드에 넣기
                         // String text ="안녕하세요" -> 파일에서 읽어와서 저장하는 거
                         //이때 서버 열어야함
-                        bookData = serverData.get("data").split("|");
+                        bookData = (serverData.get("data")).split("\\$");
+                        System.out.println(bookData[0]);
                         //캐릭터 같이 있는건 serverData이고 책 내용 쪼개논 배열은 bookData
 
                     }catch (Exception e){
@@ -207,7 +214,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected HashMap doInBackground(String... strings) {
                 try {
                     String str;
-                    URL url = new URL("http://192.9.112.96:8080/gjavaweb4/bookdata2.jsp");
+                    URL url = new URL("http://192.168.219.104:8080/gjavaweb4/bookdata2.jsp");
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -270,62 +277,63 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    Log.d("error"," conn");
+                    Log.d("error", " conn");
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestMethod("POST");
                     OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
                     JSONObject requestdata = new JSONObject();
-                    Log.d("error","json object");
-                    sendMsg = "type="+strings[0];
+                    Log.d("error", "json object");
+                    sendMsg = strings[0];
                     try {
                         requestdata.put("apiId", "gachon.pproject.6728d71a1dc3c");
                         requestdata.put("apiKey", "ed13742e94834e339b70dc8a29a2142f");
                         requestdata.put("lang", "kor");
                         requestdata.put("reqText", sendMsg);
-                        Log.d("error","json");
+                        Log.d("error", "json");
 
-                    }catch (JSONException e){
-                        Log.d("error","변환 문제");
+                    } catch (JSONException e) {
+                        Log.d("error", "변환 문제");
                     }
                     osw.write(String.valueOf(requestdata));
 
                     osw.flush();
 
-                    if(conn.getResponseCode() == conn.HTTP_OK) {
-                        Log.d("error","http ok");
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                        Log.d("error", "http ok");
                         InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
                         BufferedReader reader = new BufferedReader(tmp);
                         StringBuffer buffer = new StringBuffer();
                         while ((str = reader.readLine()) != null) {
-                            Log.d("error","buffer");
+                            Log.d("error", "buffer");
                             buffer.append(str);
                         }
                         System.out.println(buffer);
-                        String pattern = null;
+                        String pattern = "0";
                         try {
                             JSONObject jsonObject = new JSONObject(buffer.toString());
-                            pattern = jsonObject.getJSONArray("cls").getJSONObject(0).getString("category");
-                        }catch (JSONException e){
+
+
+                                pattern = jsonObject.getJSONArray("cls").getJSONObject(0).getString("category");
+
+
+                        } catch (JSONException e) {
 
                         }
-                        Log.d("category",pattern);
-                        if(pattern.indexOf("Positive")!= -1){
+                        Log.d("category", pattern);
+                        if (pattern.indexOf("Positive") != -1) {
                             System.out.println("긍정적인 페이지 입니다.");
-                            mood="2";
+                            mood = "2";
 
-                        }else if(pattern.indexOf("Negative")!=-1){
+                        } else if (pattern.indexOf("Negative") != -1) {
                             System.out.println("부정적인 페이지 입니다.");
-                            mood="1";
-                        }else{
+                            mood = "1";
+                        }else {
                             mood="3";
                         }
 
 
-
-
-
                     } else {
-                        Log.i("통신 결과", conn.getResponseCode()+"에러");
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
                     }
 
                 } catch (MalformedURLException e) {
@@ -335,6 +343,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 }
                 return null;
 
+
+          }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
             }
         }
 
