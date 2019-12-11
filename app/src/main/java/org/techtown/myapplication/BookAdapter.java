@@ -92,6 +92,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     //btnPlay click event
                     if(!play){
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
+                        audioPlayer.start();
                         play = true;
                     }
                     else {
@@ -112,7 +113,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         cView1.setBackgroundResource(0);
                         down = true;
                         Log.d("tag","hey1");
-                        String text ="안녕하세요오오오오오오";
+                        String text ="안녕하세요";
                         if(text.length()>0){
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();

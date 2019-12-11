@@ -30,7 +30,7 @@ public class TTSAPI {
         try {
             String apiId = activity.getResources().getString(R.string.apiId);
             String apiKey = activity.getResources().getString(R.string.apiKey);
-            //Log.d("tag",apiId);
+            //
             URL url = new URL("https://api.maum.ai/tts/stream");
             String text = URLEncoder.encode(args[0],"UTF-8");
             HttpURLConnection myConnection = (HttpURLConnection) url.openConnection();
@@ -90,6 +90,7 @@ public class TTSAPI {
                 }
                 br.close();
             }
+
 
         }catch (Exception e)
         {
