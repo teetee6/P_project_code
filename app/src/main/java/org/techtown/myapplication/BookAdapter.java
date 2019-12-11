@@ -1,22 +1,25 @@
 package org.techtown.myapplication;
 
-    import android.graphics.Color;
-    import android.view.LayoutInflater;
-    import android.view.View;
-    import android.view.ViewGroup;
-    import android.widget.Button;
-    import android.widget.ImageButton;
-    import android.widget.ImageView;
-    import android.widget.TextView;
-    import android.widget.Toast;
+import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-    import androidx.annotation.NonNull;
-    import androidx.cardview.widget.CardView;
-    import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
-    import org.techtown.myapplication.ui.home.HomeFragment;
+import org.techtown.myapplication.ui.home.HomeFragment;
 
-    import java.util.List;
+import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
@@ -24,6 +27,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static int cur_num;
     static boolean play = false;
     static boolean down = false;
+    static MediaPlayer audioPlayer;
 
     public BookAdapter(List<BookItem> BookList){
         mBookTempArray = BookList;
@@ -68,6 +72,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public CardView cView1;
         public ImageView bookImg;
         public ImageButton btnPlay, btnDown;
+        private ttsTask mttsTask;
+        String[] mTextString;
+        View curView;
 
         OnItemClickListener listener;
 
@@ -85,9 +92,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     //btnPlay click event
                     if(!play){
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
+                        audioPlayer.start();
                         play = true;
                     }
                     else {
+                        audioPlayer.pause();
                         btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
                         play = false;
                     }
@@ -103,6 +112,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
+                        Log.d("tag","hey1");
+                        String text ="안녕하세요";
+                        if(text.length()>0){
+                            mTextString = new String[]{text};
+                            mttsTask = new ttsTask();
+                            mttsTask.execute(mTextString);
+                            curView = v;
+                        }else{
+                            //empty text
+                        }
                     }
                     else{
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
@@ -115,5 +134,26 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public void setOnItemClickListener(OnItemClickListener listener){
             this.listener = listener;
         }
+
+        private class ttsTask extends AsyncTask<String[], Void, String> {
+            @Override
+            protected String doInBackground(String[]... strings) {
+                audioPlayer = TTSAPI.main(mTextString, curView);
+                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
+                        play = false;
+                    }
+                });
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+            }
+        }
     }
+
 }
