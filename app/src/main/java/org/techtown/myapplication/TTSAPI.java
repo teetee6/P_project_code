@@ -30,7 +30,7 @@ public class TTSAPI {
         try {
             String apiId = activity.getResources().getString(R.string.apiId);
             String apiKey = activity.getResources().getString(R.string.apiKey);
-            //
+
             URL url = new URL("https://api.maum.ai/tts/stream");
             String text = URLEncoder.encode(args[0],"UTF-8");
             HttpURLConnection myConnection = (HttpURLConnection) url.openConnection();
@@ -57,7 +57,7 @@ public class TTSAPI {
                     Log.d("Tag","mkdirs");
                 }
                 String tempName="ttstemp";
-                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".wav");
+                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".mp4");
                 f.createNewFile();
                 Log.d("tag","file saved");
                 OutputStream outputStream = new FileOutputStream(f);
@@ -65,21 +65,11 @@ public class TTSAPI {
                     outputStream.write(bytes,0, read);
                 }
                 is.close();
-                String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".wav";
+                String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".mp4";
                 audioPlayer = new MediaPlayer();
                 audioPlayer.setDataSource(path);
                 Log.d("tag",path);
                 audioPlayer.prepare();
-                audioPlayer.start();
-                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        Toast.makeText(activity.getContext(),"play ended", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(activity.getContext(), TTSAPI.class);
-                        play = true;
-                        intent.putExtra("play", play);
-                    }
-                });
             }else{
                 //error
                 br = new BufferedReader(new InputStreamReader(myConnection.getErrorStream()));
@@ -90,20 +80,10 @@ public class TTSAPI {
                 }
                 br.close();
             }
-
-
         }catch (Exception e)
         {
             System.out.println(e);
         }
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                //networking logic should be here
-            }
-        });
-
         return audioPlayer;
     }
 }

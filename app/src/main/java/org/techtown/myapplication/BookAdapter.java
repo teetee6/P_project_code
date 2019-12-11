@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.techtown.myapplication.ui.home.HomeFragment;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
@@ -85,22 +87,25 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             cView1 = (CardView) itemView.findViewById(R.id.cView1);
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
-
             btnPlay.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
                     //btnPlay click event
-                    if(!play){
-                        btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
-                        audioPlayer.start();
-                        play = true;
+                    if(down) {
+                        if (!play) {
+                            btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
+                            audioPlayer.start();
+                            play = true;
+                        } else {
+                            audioPlayer.pause();
+                            btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
+                            play = false;
+                        }
+                        Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
+
+                    }else{
+                        Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.",Toast.LENGTH_SHORT).show();
                     }
-                    else {
-                        audioPlayer.pause();
-                        btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
-                        play = false;
-                    }
-                    Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -113,11 +118,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         cView1.setBackgroundResource(0);
                         down = true;
                         Log.d("tag","hey1");
-                        String text ="안녕하세요";
+                        String text ="안녕하세요";//for test
                         if(text.length()>0){
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();
-                            mttsTask.execute(mTextString);
+                            mttsTask.execute(mTextString);//set page array
                             curView = v;
                         }else{
                             //empty text
@@ -155,5 +160,4 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
     }
-
 }
