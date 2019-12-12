@@ -1,6 +1,9 @@
 package org.techtown.myapplication;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -15,6 +18,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
@@ -25,6 +31,7 @@ import org.techtown.myapplication.ui.home.HomeFragment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -32,6 +39,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+
+import static androidx.core.graphics.drawable.IconCompat.*;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
@@ -44,8 +53,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static String mood;
     static  String[] bookData;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
-
-
+    static Bitmap bitmap = null;
+    static final String rabbit="https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
+    static final String cat ="https://c8.alamy.com/comp/P9WXB1/nystrm-jenny-a-boy-and-a-cat-on-the-bench-on-a-sunny-day-P9WXB1.jpg";
     public BookAdapter(List<BookItem> BookList){
         mBookTempArray = BookList;
     }
@@ -151,8 +161,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         // String text ="안녕하세요" -> 파일에서 읽어와서 저장하는 거
                         //이때 서버 열어야함
                         bookData = (serverData.get("data")).split("\\$");
-                        System.out.println(bookData[0]);
-                        //캐릭터 같이 있는건 serverData이고 책 내용 쪼개논 배열은 bookData
+                        imageBack task = new imageBack();
+                        task.execute().get();
+
+
+
+
 
                     }catch (Exception e){
 
@@ -214,7 +228,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected HashMap doInBackground(String... strings) {
                 try {
                     String str;
-                    URL url = new URL("http://192.168.219.104:8080/gjavaweb4/bookdata2.jsp");
+                    URL url = new URL("http://192.9.113.165:8080/gjavaweb4/bookdata2.jsp");
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -239,6 +253,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             String char1 = jsonObject.getString("char1");
                             String char2 = jsonObject.getString("char2");
                             String data = jsonObject.getString("data");
+
+
                             hashmap = new HashMap<>();
                             hashmap.put("char1",char1);
                             hashmap.put("char2",char2);
@@ -246,7 +262,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             System.out.println(hashmap);
 
                         }catch (Exception e){
-                            Log.d("error","못읽어옴");
+                            Log.d("errort1","못읽어옴");
 
 
                         }
@@ -265,6 +281,41 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
             }
         }
+
+        private class imageBack extends AsyncTask<String, Integer,Bitmap>{
+
+
+
+            @Override
+            protected Bitmap doInBackground(String... urls) {
+                // TODO Auto-generated method stub
+                try{
+                    URL myFileUrl = new URL("https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200");
+
+
+                    HttpURLConnection conn = (HttpURLConnection)myFileUrl.openConnection();
+                    conn.setDoInput(true);
+                    conn.connect();
+
+                    InputStream is = conn.getInputStream();
+
+                    bitmap = BitmapFactory.decodeStream(is);
+
+
+                }catch(IOException e){
+                    e.printStackTrace();
+                }
+                return bitmap;
+            }
+
+            protected void onPostExecute(Bitmap img){
+                bookImg.setImageBitmap(bitmap);
+            }
+
+        }
+
+
+
 
 
         class CustomTask2 extends AsyncTask<String, Void, Void> {
