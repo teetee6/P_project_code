@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,8 @@ import org.jsoup.nodes.Document;
 import org.techtown.myapplication.ui.home.HomeFragment;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -161,13 +164,42 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         // String text ="안녕하세요" -> 파일에서 읽어와서 저장하는 거
                         //이때 서버 열어야함
                         bookData = (serverData.get("data")).split("\\$");
+
+                        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                            try {
+                                String tempName="rabbit";
+
+                                File dir  = new File(Environment.getExternalStorageDirectory()+"/TTS/"+tempName);
+                                if(!dir.exists()){
+                                    dir.mkdirs();
+                                    Log.d("Tag","mkdirs");
+                                }
+
+
+                                //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
+                                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+"/"+tempName+".txt");
+                                FileWriter fw = new FileWriter(f,false);
+                                fw.write(bookData.toString());
+                                fw.close();
+                                f.createNewFile();
+                                Log.d("Tag","rabbit/rabbit.txt 생성");
+
+
+
+
+
+                            }catch (Exception e){
+
+
+                            }
+
+
+                        }
+                        //external storage에 bookData 저장하는 코드
+
                         imageBack task = new imageBack();
                         task.execute().get();
-
-
-
-
-
+                        //image가져오는 코드!
                     }catch (Exception e){
 
                     }
