@@ -144,7 +144,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     player.start();
                                     audioPlayer.start();
                                     play = true;
-                                    Thread.sleep(5000);
+                                    int duration =audioPlayer.getDuration();
+                                    Thread.sleep(duration+10);
 
                                 } catch (Exception e) {
                                 }
