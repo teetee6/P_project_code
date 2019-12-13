@@ -56,7 +56,7 @@ public class DashboardFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rViewEnglish.setLayoutManager(layoutManager);
-        mBookAdapter = new BookAdapter(mBookArray);
+        mBookAdapter = new BookAdapter(mBookArray,getActivity());
 
         rViewEnglish.setAdapter(mBookAdapter);
         rViewEnglish.setItemAnimator(new DefaultItemAnimator());

@@ -1,5 +1,7 @@
 package org.techtown.myapplication.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -35,6 +37,7 @@ public class HomeFragment extends Fragment {
     RecyclerView rViewKorean;
     static View root;
 
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_home, container, false);
@@ -60,7 +63,7 @@ public class HomeFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rViewKorean.setLayoutManager(layoutManager);
-        mBookAdapter = new BookAdapter(mBookArray);
+        mBookAdapter = new BookAdapter(mBookArray,getActivity());
 
         rViewKorean.setAdapter(mBookAdapter);
         rViewKorean.setItemAnimator(new DefaultItemAnimator());

@@ -66,6 +66,7 @@ public class TTSAPI {
                 }
                 is.close();
                 String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".wav";
+
                 audioPlayer = new MediaPlayer();
                 audioPlayer.setDataSource(path);
                 Log.d("tag",path);
