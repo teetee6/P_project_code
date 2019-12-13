@@ -253,12 +253,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             String char1 = jsonObject.getString("char1");
                             String char2 = jsonObject.getString("char2");
                             String data = jsonObject.getString("data");
+                            String title = jsonObject.getString("title");
 
 
                             hashmap = new HashMap<>();
                             hashmap.put("char1",char1);
                             hashmap.put("char2",char2);
                             hashmap.put("data",data);
+                            hashmap.put("title",title);
+
                             System.out.println(hashmap);
 
                         }catch (Exception e){
