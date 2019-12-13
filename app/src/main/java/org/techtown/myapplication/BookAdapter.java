@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -58,6 +59,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static HashMap<String,String> serverData;
     static String mood;
     static  String[] bookData;
+    static MediaPlayer player;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
     static final String rabbit="https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
@@ -136,19 +138,79 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             for(int i =0; i<bookData.length; i++) {
                                 try {
                                     CustomTask2 customtask2 = new CustomTask2();
-                                    customtask2.execute(bookData[0]).get();
+                                    customtask2.execute(bookData[i]).get();
                                     System.out.println(bookData[i]);
                                     System.out.println(mood);
                                     //random 사용해서 배경음악 선택
-                                    MediaPlayer player = MediaPlayer.create(context, R.raw.m2);
+                                    Random random = new Random();
+                                    int randomValue = random.nextInt(3);
+
+                                    if(mood.equals("1")){
+                                        switch(randomValue){
+                                            case 0:
+                                                player = MediaPlayer.create(context, R.raw.n0);
+                                                break;
+                                            case 1:
+                                                player = MediaPlayer.create(context, R.raw.n1);
+                                                break;
+                                            case 2:
+                                                player = MediaPlayer.create(context, R.raw.n2);
+                                                break;
+                                             default:
+                                                 break;
+
+
+                                        }
+                                    }else if(mood.equals("2")){
+                                        switch(randomValue){
+                                            case 0:
+                                                player = MediaPlayer.create(context, R.raw.p0);
+                                                break;
+                                            case 1:
+                                                player = MediaPlayer.create(context, R.raw.p1);
+                                                break;
+                                            case 2:
+                                                player = MediaPlayer.create(context, R.raw.p2);
+                                                break;
+                                            default:
+                                                break;
+
+
+                                        }
+                                    }else if(mood.equals("3")){
+                                        switch(randomValue){
+                                            case 0:
+                                                player = MediaPlayer.create(context, R.raw.m0);
+                                                break;
+                                            case 1:
+                                                player = MediaPlayer.create(context, R.raw.m1);
+                                                break;
+                                            case 2:
+                                                player = MediaPlayer.create(context, R.raw.m2);
+                                                break;
+                                            default:
+                                                break;
+
+
+                                        }
+                                    }
+
                                     player.start();
                                     audioPlayer.start();
                                     play = true;
+
                                     int duration =audioPlayer.getDuration();
-                                    Thread.sleep(duration+10);
+                                    try {
+                                        Thread.sleep(duration + 100);
+                                        player.pause();
+                                    }catch (InterruptedException e){
+                                    }
+
+
 
                                 } catch (Exception e) {
                                 }
+
 
                             }
 
