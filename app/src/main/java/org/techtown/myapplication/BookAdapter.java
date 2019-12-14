@@ -439,8 +439,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                     }
                 }
+                player.setVolume((float) 0.48,(float) 0.48);
 
                 player.start();
+
                 play = true;
 
 
