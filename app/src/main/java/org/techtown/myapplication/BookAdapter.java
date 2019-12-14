@@ -3,6 +3,7 @@ package org.techtown.myapplication;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import org.jsoup.nodes.Document;
 import org.techtown.myapplication.ui.home.HomeFragment;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -37,13 +39,14 @@ import java.util.Map;
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     static private List<BookItem> mBookTempArray;
-    static int cur_num;
+    static int cur_num, cur_page;
     static boolean play = false;
     static boolean down = false;
-    static MediaPlayer audioPlayer;
+    static MediaPlayer audioPlayer = new MediaPlayer();
     static HashMap<String,String> serverData;
     static String mood;
     static  String[] bookData;
+    static boolean complete = false;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
 
 
@@ -103,6 +106,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             cView1 = (CardView) itemView.findViewById(R.id.cView1);
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
+            
             btnPlay.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
@@ -110,8 +114,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     if(down) {
                         if (!play) {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
-                            audioPlayer.start();
                             play = true;
+                            setPlayList("title",0);//TODO: set title
+                            if(complete)
+                                btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
                         } else {
                             audioPlayer.pause();
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
@@ -119,28 +125,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         }
                         Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
 
-                    }else{
+                    }else{//TODO: check whether file is downloaded or not
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.",Toast.LENGTH_SHORT).show();
                     }
-                    try {
-                        for(int i =0; i<bookData.length; i++) {
-                        CustomTask2 customtask2 = new CustomTask2();
-
-                            customtask2.execute(bookData[i]).get();
-                            System.out.println(bookData[i]);
-
-                             System.out.println(mood);
-                        }
-                        //                        //sd카드에서 데이터 가져오기
-                        //                        //인자로 넣어주기
-                        //                        //for문
-                        //                        //for문 안에서 무드 별
-
-                    }catch (Exception e){
-
-                    }
-
-
                     Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
                 }
             });
@@ -158,22 +145,30 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         bookData = (serverData.get("data")).split("\\$");
                         System.out.println(bookData[0]);
                         //캐릭터 같이 있는건 serverData이고 책 내용 쪼개논 배열은 bookData
-
+                        for(int i =0; i<bookData.length; i++) {
+                            CustomTask2 customtask2 = new CustomTask2();
+                            customtask2.execute(bookData[i]).get();
+                            System.out.println(bookData[i]);
+                            System.out.println(mood);
+                        }
+                        //                        //sd카드에서 데이터 가져오기
+                        //                        //인자로 넣어주기
+                        //                        //for문
+                        //                        //for문 안에서 무드 별
                     }catch (Exception e){
 
                     }
 
-                    if(!down){
+                    if(!down){//TODO: check book data. if it exists
                         btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
-                        Log.d("tag","hey1");
-                        String text ="안녕하세요";//for test
-                        if(text.length()>0){
-                            mTextString = new String[]{text};
+                        //Log.d("tag","hey1");
+                        if(bookData.length>0){//set first page to ttsTask
+                            mTextString = new String[]{bookData[0]};
                             mttsTask = new ttsTask();
-                            mttsTask.execute(mTextString);//set page array
+                            mttsTask.execute(mTextString);
                             curView = v;
                         }else{
                             //empty text
@@ -182,6 +177,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     else{
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
+                        //TODO: delete book data
+
                     }
                 }
             });
@@ -191,24 +188,20 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             this.listener = listener;
         }
 
-        private class ttsTask extends AsyncTask<String[], Void, HashMap> {
-            HashMap hashMap;
-                @Override
-                protected HashMap doInBackground(String[]... strings) {
-                audioPlayer = TTSAPI.main(mTextString, curView);
-                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
-                        play = false;
-                    }
-                });
-                return hashMap;
+        private class ttsTask extends AsyncTask<String[], Void, String> {
+            @Override
+            protected String doInBackground(String[]... strings) {//6 pages
+                for (int i = 0; i <bookData.length;i++){
+                    mTextString = new String[]{bookData[i]};//set next page
+                    TTSAPI.main(mTextString, "title", i, curView);
+                }
+                return null;
             }
 
             @Override
-            protected void onPostExecute(HashMap s) {
+            protected void onPostExecute(String s) {
                 super.onPostExecute(s);
+                Toast.makeText(curView.getContext(), "전부 다운로드 하였습니다.",Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -219,7 +212,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected HashMap doInBackground(String... strings) {
                 try {
                     String str;
-                    URL url = new URL("http://192.168.219.104:8080/gjavaweb4/bookdata2.jsp");
+                    URL url = new URL("http://10.0.2.2:8080/gjavaweb/addrbook/server.jsp");
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -233,6 +226,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         BufferedReader reader = new BufferedReader(tmp);
                         StringBuffer buffer = new StringBuffer();
                         while ((str = reader.readLine()) != null) {
+
                             buffer.append(str);
                         }
                         receiveMsg = buffer.toString();
@@ -252,11 +246,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         }catch (Exception e){
                             Log.d("error","못읽어옴");
-
-
                         }
-
-
                     } else {
                         Log.i("통신 결과", conn.getResponseCode()+"에러");
                     }
@@ -267,11 +257,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     e.printStackTrace();
                 }
                 return hashmap;
-
             }
         }
-
-
         class CustomTask2 extends AsyncTask<String, Void, Void> {
             String sendMsg, receiveMsg;
             @Override
@@ -316,13 +303,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         String pattern = "0";
                         try {
                             JSONObject jsonObject = new JSONObject(buffer.toString());
-
-
-                                pattern = jsonObject.getJSONArray("cls").getJSONObject(0).getString("category");
-
-
+                            pattern = jsonObject.getJSONArray("cls").getJSONObject(0).getString("category");
                         } catch (JSONException e) {
-
                         }
                         Log.d("category", pattern);
                         if (pattern.indexOf("Positive") != -1) {
@@ -335,8 +317,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         }else {
                             mood="3";
                         }
-
-
                     } else {
                         Log.i("통신 결과", conn.getResponseCode() + "에러");
                     }
@@ -347,8 +327,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     e.printStackTrace();
                 }
                 return null;
-
-
           }
 
             @Override
@@ -356,7 +334,34 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 super.onPostExecute(aVoid);
             }
         }
+    }
 
-
+    public static void setPlayList(String t, int page){
+        try {
+            complete=false;
+            cur_page = page;
+            String tempName = t + page;
+            String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";//TODO: set title
+            Log.d("tag", path);
+            audioPlayer = new MediaPlayer();
+            audioPlayer.setDataSource(path);
+            audioPlayer.prepare();
+            audioPlayer.start();
+            audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    audioPlayer.reset();
+                    cur_page++;
+                    if(cur_page<bookData.length) {
+                        setPlayList("title", cur_page);
+                    }else{
+                        complete = true;
+                        Log.d("status",Boolean.toString(complete));
+                    }
+                }
+            });
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }

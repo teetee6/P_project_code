@@ -22,11 +22,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 
 public class TTSAPI {
-    static Boolean play = false;
-    static MediaPlayer audioPlayer;
-    public static MediaPlayer main(String[] args, final View activity){
+
+    public static void main(String[] args, String title, int page, final View activity){
         try {
             String apiId = activity.getResources().getString(R.string.apiId);
             String apiKey = activity.getResources().getString(R.string.apiKey);
@@ -52,24 +52,25 @@ public class TTSAPI {
                 byte[] bytes = new byte[1024];
 
                 File dir  = new File(Environment.getExternalStorageDirectory()+"/TTS");
+                File dir2 = new File(Environment.getExternalStorageDirectory()+"/TTS/"+title);//current name
                 if(!dir.exists()){
                     dir.mkdirs();
-                    Log.d("Tag","mkdirs");
+                    Log.d("Tag","mkdirs1");
+                }else if(!dir2.exists()){
+                    dir2.mkdirs();
+                    Log.d("Tag","mkdirs2");
                 }
-                String tempName="ttstemp";
-                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".mp4");
+                String tempName=title+page;//토끼와 거북이 1
+                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+title+"/"+tempName+".mp4");
                 f.createNewFile();
-                Log.d("tag","file saved");
+                String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+title+"/"+tempName+".mp4";
+                Log.d("tag","file saved: "+tempName);
+                Log.d("tag","path:" +path);
                 OutputStream outputStream = new FileOutputStream(f);
                 while((read = is.read(bytes)) != -1){
                     outputStream.write(bytes,0, read);
                 }
                 is.close();
-                String path = Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+".mp4";
-                audioPlayer = new MediaPlayer();
-                audioPlayer.setDataSource(path);
-                Log.d("tag",path);
-                audioPlayer.prepare();
             }else{
                 //error
                 br = new BufferedReader(new InputStreamReader(myConnection.getErrorStream()));
@@ -84,7 +85,6 @@ public class TTSAPI {
         {
             System.out.println(e);
         }
-        return audioPlayer;
     }
 }
 
