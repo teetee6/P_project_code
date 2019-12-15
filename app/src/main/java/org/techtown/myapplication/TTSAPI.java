@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 public class TTSAPI {
 
-    public static void main(String[] args, String title, int page, final View activity){
+    public static void main(String[] args, String title, int page, String type,final View activity){
         try {
             String apiId = activity.getResources().getString(R.string.apiId);
             String apiKey = activity.getResources().getString(R.string.apiKey);
@@ -35,7 +35,13 @@ public class TTSAPI {
             String text = URLEncoder.encode(args[0],"UTF-8");
             HttpURLConnection myConnection = (HttpURLConnection) url.openConnection();
             myConnection.setRequestMethod("POST");
-            String postParams = "apiId="+apiId+"&apiKey="+apiKey+"&voiceName=baseline_kor&text="+text;
+            String lang;
+            if(type.equals("kor")) {
+                lang = "kor";
+            }else{
+                lang = "eng";
+            }
+            String postParams = "apiId="+apiId+"&apiKey="+apiKey+"&voiceName=baseline_"+lang+"&text="+text;
             myConnection.setDoInput(true);
             myConnection.setDoOutput(true);//send post data to OutputStream
             DataOutputStream wr = new DataOutputStream(myConnection.getOutputStream());

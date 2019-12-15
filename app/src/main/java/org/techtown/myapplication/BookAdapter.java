@@ -191,7 +191,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         try {
                             CustomTask customtask = new CustomTask();
-                            serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
+                            serverData = customtask.execute("cat").get();//TODO: set server_title from bookItem
                             bookData = (serverData.get("data")).split("\\$");
                             moodData = new String[bookData.length];
 
@@ -261,7 +261,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected String doInBackground(String[]... strings) {//6 pages
                 for (int i = 0; i < bookData.length; i++) {
                     mTextString = new String[]{bookData[i]};//set next page
-                    TTSAPI.main(mTextString, serverData.get("title_server"), i, curView);
+                    TTSAPI.main(mTextString, serverData.get("title_server"), i, serverData.get("type"),curView);
                 }
                 return null;
             }
@@ -310,7 +310,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             String data = jsonObject.getString("data");
                             String title = jsonObject.getString("title");
                             String title_server = jsonObject.getString("title_server");
-
+                            String type = jsonObject.getString("type");
 
                             hashmap = new HashMap<>();
                             hashmap.put("char1", char1);
@@ -318,6 +318,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             hashmap.put("data", data);
                             hashmap.put("title", title);
                             hashmap.put("title_server",title_server);
+                            hashmap.put("type",type);
 
                             System.out.println(hashmap);
 
