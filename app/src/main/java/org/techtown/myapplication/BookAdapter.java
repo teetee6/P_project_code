@@ -123,6 +123,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
 
+            File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
+            if(dir.exists()) {
+                down = true;
+                btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
+            }
+            else
+                down = false;
+
             btnPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,7 +161,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         }
                         Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
 
-                    } else {//TODO: check whether file is downloaded or not
+                    } else {
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
 
@@ -166,13 +174,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnDown.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //get book file from server and put it in external storage
                     try {
                         CustomTask customtask = new CustomTask();
-                        serverData = customtask.execute("rabbit").get();
-                        //인자 넣어주기
-                        //sd카드에 넣기
-                        // String text ="안녕하세요" -> 파일에서 읽어와서 저장하는 거
-                        //이때 서버 열어야함
+                        serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
                         bookData = (serverData.get("data")).split("\\$");
                         moodData = new String[bookData.length];
 
@@ -186,7 +191,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     Log.d("Tag", "mkdirs");
                                 }
 
-
                                 //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
                                 File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
                                 FileWriter fw = new FileWriter(f, false);
@@ -194,30 +198,24 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 fw.close();
                                 f.createNewFile();
                                 Log.d("Tag", "rabbit/rabbit.txt 생성");
-
-
                             } catch (Exception e) {
-
-
+                                e.printStackTrace();
                             }
-
-
                         }
-                        //external storage에 bookData 저장하는 코드
 
                         imageBack task = new imageBack();
                         task.execute().get();
                         //image가져오는 코드!
                     } catch (Exception e) {
-
+                        e.printStackTrace();
                     }
 
-                    if (!down) {//TODO: check book data. if it exists
+                    if (!down) {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
-                        //Log.d("tag","hey1");
+
                         String text =bookData[0];
                         if(text.length()>0){
                             mTextString = new String[]{text};
@@ -230,7 +228,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     } else {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
-                        //TODO: delete book data
                         File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + serverData.get("title_server"));
                         if (dir.isDirectory())
                         {
@@ -240,7 +237,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 new File(dir, children[i]).delete();
                             }
                             dir.delete();
-                            Log.d("tag","Successfully deleted whole file of "+serverData.get("titl_server"));
+                            Log.d("tag","Successfully deleted whole file of "+serverData.get("title_server"));
                         }
                     }
                 }
@@ -338,7 +335,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
             @Override
             protected Bitmap doInBackground(String... urls) {
-                // TODO Auto-generated method stub
                 try{
                     URL myFileUrl = new URL(rabbit);
 
@@ -448,7 +444,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             complete = false;
             cur_page = page;
             String tempName = t + page;
-            String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";//TODO: set title
+            String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";
             Log.d("tag", path);
             Resources resources = context.getResources();
             Uri uri = new Uri.Builder()
