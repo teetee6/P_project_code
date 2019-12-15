@@ -231,7 +231,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
                         //TODO: delete book data
-
+                        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + serverData.get("title_server"));
+                        if (dir.isDirectory())
+                        {
+                            String[] children = dir.list();
+                            for (int i = 0; i < children.length; i++)
+                            {
+                                new File(dir, children[i]).delete();
+                            }
+                            dir.delete();
+                            Log.d("tag","Successfully deleted whole file of "+serverData.get("titl_server"));
+                        }
                     }
                 }
             });
