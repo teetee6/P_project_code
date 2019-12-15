@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.Random;
 
 import androidx.annotation.NonNull;
@@ -57,19 +58,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static boolean play = false;
     static boolean down = false;
     static MediaPlayer audioPlayer = new MediaPlayer();
-    static HashMap<String,String> serverData;
+    static MediaPlayer player;
+    static HashMap<String, String> serverData;
     static String mood;
-    static  String[] bookData;
+    static String[] bookData;
     static boolean complete = false;
-    static MediaPlayer audioPlayer;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
-    static final String rabbit="https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
-    static final String cat ="https://c8.alamy.com/comp/P9WXB1/nystrm-jenny-a-boy-and-a-cat-on-the-bench-on-a-sunny-day-P9WXB1.jpg";
+    static final String rabbit = "https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
+    static final String cat = "https://c8.alamy.com/comp/P9WXB1/nystrm-jenny-a-boy-and-a-cat-on-the-bench-on-a-sunny-day-P9WXB1.jpg";
 
 
-
-    public BookAdapter(List<BookItem> BookList, Context c){
+    public BookAdapter(List<BookItem> BookList, Context c) {
 
         mBookTempArray = BookList;
         this.context = c;
@@ -77,40 +77,39 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     }
 
     OnItemClickListener listener;
-    public static interface OnItemClickListener{
+
+    public static interface OnItemClickListener {
         public void onItemClick(ViewHolder holder, View view, int position);
     }
 
-    static public BookItem getItem(int position){
+    static public BookItem getItem(int position) {
         return mBookTempArray.get(position);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview,parent,false));
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview, parent, false));
 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bookImg.setImageResource(R.mipmap.ic_action_crop_original); //img src setting
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//img src setting
         holder.tBookTitle.setText(mBookTempArray.get(position).getName());
-        cur_num=position;
+        cur_num = position;
         holder.setOnItemClickListener(listener);
     }
 
 
-
-    public int getItemCount(){
+    public int getItemCount() {
         return mBookTempArray.size();
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener){
+    public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tBookTitle;
         public CardView cView1;
         public ImageView bookImg;
@@ -121,7 +120,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
         OnItemClickListener listener;
 
-        public ViewHolder(final View itemView){
+        public ViewHolder(final View itemView) {
             super(itemView);
             tBookTitle = (TextView) itemView.findViewById(R.id.tBookTitle);
             bookImg = (ImageView) itemView.findViewById(R.id.bookImg);
@@ -129,18 +128,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
 
-            btnPlay.setOnClickListener(new View.OnClickListener(){
+            btnPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //btnPlay click event
-
-
+                    if (down) {
                         if (!play) {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                             play = true;
-                            setPlayList("title",0);//TODO: set title
+                            setPlayList(serverData.get("title_server"), 0);//TODO: set title
                             //if(complete){};
-                            for(int i =0; i<bookData.length; i++) {
+                            for (int i = 0; i < bookData.length; i++) {
                                 try {
                                     CustomTask2 customtask2 = new CustomTask2();
                                     customtask2.execute(bookData[i]).get();
@@ -150,8 +148,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     Random random = new Random();
                                     int randomValue = random.nextInt(3);
 
-                                    if(mood.equals("1")){
-                                        switch(randomValue){
+                                    if (mood.equals("1")) {
+                                        switch (randomValue) {
                                             case 0:
                                                 player = MediaPlayer.create(context, R.raw.n0);
                                                 break;
@@ -161,13 +159,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                             case 2:
                                                 player = MediaPlayer.create(context, R.raw.n2);
                                                 break;
-                                             default:
-                                                 break;
+                                            default:
+                                                break;
 
 
                                         }
-                                    }else if(mood.equals("2")){
-                                        switch(randomValue){
+                                    } else if (mood.equals("2")) {
+                                        switch (randomValue) {
                                             case 0:
                                                 player = MediaPlayer.create(context, R.raw.p0);
                                                 break;
@@ -182,8 +180,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
 
                                         }
-                                    }else if(mood.equals("3")){
-                                        switch(randomValue){
+                                    } else if (mood.equals("3")) {
+                                        switch (randomValue) {
                                             case 0:
                                                 player = MediaPlayer.create(context, R.raw.m0);
                                                 break;
@@ -204,13 +202,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     audioPlayer.start();
                                     play = true;
 
-                                    int duration =audioPlayer.getDuration();
+                                    int duration = audioPlayer.getDuration();
                                     try {
                                         Thread.sleep(duration + 100);
                                         player.pause();
-                                    }catch (InterruptedException e){
+                                    } catch (InterruptedException e) {
                                     }
-
 
 
                                 } catch (Exception e) {
@@ -219,7 +216,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                             }
 
-
                         } else {
                             audioPlayer.pause();
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
@@ -227,8 +223,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         }
                         Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
 
-                    }else{//TODO: check whether file is downloaded or not
-                        Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.",Toast.LENGTH_SHORT).show();
+                    } else {//TODO: check whether file is downloaded or not
+                        Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
 
                    /* try {
@@ -241,6 +237,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                        // }
                     }catch (Exception e){
                     }*/
+                }
+            });
 
             btnDown.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -254,30 +252,27 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         //이때 서버 열어야함
                         bookData = (serverData.get("data")).split("\\$");
 
-                        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                             try {
-                                String tempName="rabbit";
+                                String tempName = serverData.get("title_server");
 
-                                File dir  = new File(Environment.getExternalStorageDirectory()+"/TTS/"+tempName);
-                                if(!dir.exists()){
+                                File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
+                                if (!dir.exists()) {
                                     dir.mkdirs();
-                                    Log.d("Tag","mkdirs");
+                                    Log.d("Tag", "mkdirs");
                                 }
 
 
                                 //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
-                                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+tempName+"/"+tempName+".txt");
-                                FileWriter fw = new FileWriter(f,false);
+                                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
+                                FileWriter fw = new FileWriter(f, false);
                                 fw.write(bookData.toString());
                                 fw.close();
                                 f.createNewFile();
-                                Log.d("Tag","rabbit/rabbit.txt 생성");
+                                Log.d("Tag", "rabbit/rabbit.txt 생성");
 
 
-
-
-
-                            }catch (Exception e){
+                            } catch (Exception e) {
 
 
                             }
@@ -289,26 +284,25 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         imageBack task = new imageBack();
                         task.execute().get();
                         //image가져오는 코드!
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
 
-                    if(!down){//TODO: check book data. if it exists
+                    if (!down) {//TODO: check book data. if it exists
                         btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
                         //Log.d("tag","hey1");
-                        if(bookData.length>0){//set first page to ttsTask
+                        if (bookData.length > 0) {//set first page to ttsTask
                             mTextString = new String[]{bookData[0]};
                             mttsTask = new ttsTask();
                             mttsTask.execute(mTextString);
                             curView = v;
-                        }else{
+                        } else {
                             //empty text
                         }
-                    }
-                    else{
+                    } else {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
                         //TODO: delete book data
@@ -318,16 +312,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             });
         }
 
-        public void setOnItemClickListener(OnItemClickListener listener){
+        public void setOnItemClickListener(OnItemClickListener listener) {
             this.listener = listener;
         }
 
         private class ttsTask extends AsyncTask<String[], Void, String> {
             @Override
             protected String doInBackground(String[]... strings) {//6 pages
-                for (int i = 0; i <bookData.length;i++){
+                for (int i = 0; i < bookData.length; i++) {
                     mTextString = new String[]{bookData[i]};//set next page
-                    TTSAPI.main(mTextString, "title", i, curView);
+                    TTSAPI.main(mTextString, serverData.get("title_server"), i, curView);
                 }
                 return null;
             }
@@ -335,13 +329,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                Toast.makeText(curView.getContext(), "전부 다운로드 하였습니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(curView.getContext(), "전부 다운로드 하였습니다.", Toast.LENGTH_SHORT).show();
             }
         }
 
         class CustomTask extends AsyncTask<String, Void, HashMap> {
             String sendMsg, receiveMsg;
-            HashMap<String,String> hashmap;
+            HashMap<String, String> hashmap;
+
             @Override
             protected HashMap doInBackground(String... strings) {
                 try {
@@ -352,10 +347,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     conn.setRequestMethod("POST");
                     OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-                    sendMsg = "type="+strings[0];
+                    sendMsg = "type=" + strings[0];
                     osw.write(sendMsg);
                     osw.flush();
-                    if(conn.getResponseCode() == conn.HTTP_OK) {
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
                         InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
                         BufferedReader reader = new BufferedReader(tmp);
                         StringBuffer buffer = new StringBuffer();
@@ -366,30 +361,32 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         receiveMsg = buffer.toString();
                         Document doc = Jsoup.parse(receiveMsg);
                         System.out.println(doc.text());
-                        receiveMsg= doc.text();
-                        try{
+                        receiveMsg = doc.text();
+                        try {
                             JSONObject jsonObject = new JSONObject(receiveMsg);
                             String char1 = jsonObject.getString("char1");
                             String char2 = jsonObject.getString("char2");
                             String data = jsonObject.getString("data");
                             String title = jsonObject.getString("title");
+                            String title_server = jsonObject.getString("title_server");
 
 
                             hashmap = new HashMap<>();
-                            hashmap.put("char1",char1);
-                            hashmap.put("char2",char2);
-                            hashmap.put("data",data);
-                            hashmap.put("title",title);
+                            hashmap.put("char1", char1);
+                            hashmap.put("char2", char2);
+                            hashmap.put("data", data);
+                            hashmap.put("title", title);
+                            hashmap.put("title_server",title_server);
 
                             System.out.println(hashmap);
 
-                        }catch (Exception e){
-                            Log.d("errort1","못읽어옴");
+                        } catch (Exception e) {
+                            Log.d("errort1", "못읽어옴");
 
 
                         }
                     } else {
-                        Log.i("통신 결과", conn.getResponseCode()+"에러");
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
                     }
 
                 } catch (MalformedURLException e) {
@@ -401,18 +398,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
 
-        private class imageBack extends AsyncTask<String, Integer,Bitmap>{
-
+        private class imageBack extends AsyncTask<String, Integer, Bitmap> {
 
 
             @Override
             protected Bitmap doInBackground(String... urls) {
                 // TODO Auto-generated method stub
-                try{
+                try {
                     URL myFileUrl = new URL("https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200");
 
 
-                    HttpURLConnection conn = (HttpURLConnection)myFileUrl.openConnection();
+                    HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
                     conn.setDoInput(true);
                     conn.connect();
 
@@ -421,24 +417,22 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     bitmap = BitmapFactory.decodeStream(is);
 
 
-                }catch(IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
                 return bitmap;
             }
 
-            protected void onPostExecute(Bitmap img){
+            protected void onPostExecute(Bitmap img) {
                 bookImg.setImageBitmap(bitmap);
             }
 
         }
 
 
-
-
-
         class CustomTask2 extends AsyncTask<String, Void, Void> {
             String sendMsg, receiveMsg;
+
             @Override
             protected Void doInBackground(String... strings) {
                 try {
@@ -492,8 +486,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         } else if (pattern.indexOf("Negative") != -1) {
                             System.out.println("부정적인 페이지 입니다.");
                             mood = "1";
-                        }else {
-                            mood="3";
+                        } else {
+                            mood = "3";
                         }
                     } else {
                         Log.i("통신 결과", conn.getResponseCode() + "에러");
@@ -505,7 +499,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     e.printStackTrace();
                 }
                 return null;
-          }
+            }
 
             @Override
             protected void onPostExecute(Void aVoid) {
@@ -514,9 +508,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         }
     }
 
-    public static void setPlayList(String t, int page){
+    public static void setPlayList(String t, int page) {
         try {
-            complete=false;
+            complete = false;
             cur_page = page;
             String tempName = t + page;
             String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";//TODO: set title
@@ -530,15 +524,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 public void onCompletion(MediaPlayer mp) {
                     audioPlayer.reset();
                     cur_page++;
-                    if(cur_page<bookData.length) {
-                        setPlayList("title", cur_page);
-                    }else{
+                    if (cur_page < bookData.length) {
+                        setPlayList(serverData.get("title_server"), cur_page);
+                    } else {
                         complete = true;
-                        Log.d("status",Boolean.toString(complete));
+                        Log.d("status", Boolean.toString(complete));
                     }
                 }
             });
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
