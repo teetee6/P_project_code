@@ -1,5 +1,6 @@
 package org.techtown.myapplication;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,6 +24,7 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
@@ -58,6 +60,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static String[] bookData, moodData;
     static boolean complete = false;
     static String tempName;
+    static Activity activity;
+    static ProgressBar progress;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
     static final String rabbit = "https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
@@ -68,6 +72,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
         mBookTempArray = BookList;
         this.context = c;
+        activity = (Activity)c;
 
     }
 
@@ -91,6 +96,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//img src setting
         holder.tBookTitle.setText(mBookTempArray.get(position).getName());
+
         cur_num = position;
         holder.setOnItemClickListener(listener);
     }
@@ -175,46 +181,48 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     //get book file from server and put it in external storage
-                    try {
-                        CustomTask customtask = new CustomTask();
-                        serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
-                        bookData = (serverData.get("data")).split("\\$");
-                        moodData = new String[bookData.length];
-
-                        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                            try {
-                                String tempName = serverData.get("title_server");
-
-                                File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
-                                if (!dir.exists()) {
-                                    dir.mkdirs();
-                                    Log.d("Tag", "mkdirs");
-                                }
-
-                                //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
-                                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
-                                FileWriter fw = new FileWriter(f, false);
-                                fw.write(bookData.toString());
-                                fw.close();
-                                f.createNewFile();
-                                Log.d("Tag", "rabbit/rabbit.txt 생성");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        imageBack task = new imageBack();
-                        task.execute().get();
-                        //image가져오는 코드!
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
                     if (!down) {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
                         cView1.setCardBackgroundColor(Color.GRAY);
                         cView1.setBackgroundResource(0);
                         down = true;
+                        progress = new ProgressBar(activity);
+                        progress.showDialog();
+
+                        try {
+                            CustomTask customtask = new CustomTask();
+                            serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
+                            bookData = (serverData.get("data")).split("\\$");
+                            moodData = new String[bookData.length];
+
+                            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                                try {
+                                    String tempName = serverData.get("title_server");
+
+                                    File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
+                                    if (!dir.exists()) {
+                                        dir.mkdirs();
+                                        Log.d("Tag", "mkdirs");
+                                    }
+
+                                    //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
+                                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
+                                    FileWriter fw = new FileWriter(f, false);
+                                    fw.write(bookData.toString());
+                                    fw.close();
+                                    f.createNewFile();
+                                    Log.d("Tag", "rabbit/rabbit.txt 생성");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            imageBack task = new imageBack();
+                            task.execute().get();
+                            //image가져오는 코드!
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         String text =bookData[0];
                         if(text.length()>0){
@@ -228,7 +236,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     } else {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
-                        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + serverData.get("title_server"));
+                        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get this from bookItem
                         if (dir.isDirectory())
                         {
                             String[] children = dir.list();
@@ -237,7 +245,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 new File(dir, children[i]).delete();
                             }
                             dir.delete();
-                            Log.d("tag","Successfully deleted whole file of "+serverData.get("title_server"));
+                            Log.d("tag","Successfully deleted whole file of "+"rabbit");
                         }
                     }
                 }
@@ -262,6 +270,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
                 Toast.makeText(curView.getContext(), "전부 다운로드 하였습니다.", Toast.LENGTH_SHORT).show();
+                progress.hideDialog();
             }
         }
 
