@@ -1,0 +1,75 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="org.techtown.myapplication"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="19"
+8-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:5:5-66
+11-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:5:22-64
+12    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+12-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:6:5-81
+12-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:6:22-78
+13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+13-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:7:5-80
+13-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:7:22-77
+14
+15    <application
+15-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:9:5-27:19
+16        android:allowBackup="true"
+16-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:10:9-35
+17        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+17-->[androidx.core:core:1.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/f01b27bb220ecb79298884ef36a7a2fb/core-1.1.0/AndroidManifest.xml:24:18-86
+18        android:debuggable="true"
+19        android:icon="@mipmap/ic_launcher"
+19-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:11:9-43
+20        android:label="@string/app_name"
+20-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:12:9-41
+21        android:requestLegacyExternalStorage="true"
+21-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:17:9-52
+22        android:roundIcon="@mipmap/ic_launcher_round"
+22-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:13:9-54
+23        android:supportsRtl="true"
+23-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:14:9-35
+24        android:testOnly="true"
+25        android:theme="@style/AppTheme"
+25-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:15:9-40
+26        android:usesCleartextTraffic="true" >
+26-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:16:9-44
+27        <activity
+27-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:18:9-26:20
+28            android:name="org.techtown.myapplication.MainActivity"
+28-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:19:13-41
+29            android:label="@string/app_name" >
+29-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:20:13-45
+30            <intent-filter>
+30-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:21:13-25:29
+31                <action android:name="android.intent.action.MAIN" />
+31-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:22:17-69
+31-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:22:25-66
+32
+33                <category android:name="android.intent.category.LAUNCHER" />
+33-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:24:17-77
+33-->/Users/Kelly/AndroidStudioProjects/P_project_code/app/src/main/AndroidManifest.xml:24:27-74
+34            </intent-filter>
+35        </activity>
+36
+37        <provider
+37-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/55580b0ab45b69249933074462ab11c2/lifecycle-process-2.1.0/AndroidManifest.xml:23:9-27:43
+38            android:name="androidx.lifecycle.ProcessLifecycleOwnerInitializer"
+38-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/55580b0ab45b69249933074462ab11c2/lifecycle-process-2.1.0/AndroidManifest.xml:24:13-79
+39            android:authorities="org.techtown.myapplication.lifecycle-process"
+39-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/55580b0ab45b69249933074462ab11c2/lifecycle-process-2.1.0/AndroidManifest.xml:25:13-69
+40            android:exported="false"
+40-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/55580b0ab45b69249933074462ab11c2/lifecycle-process-2.1.0/AndroidManifest.xml:26:13-37
+41            android:multiprocess="true" />
+41-->[androidx.lifecycle:lifecycle-process:2.1.0] /Users/Kelly/.gradle/caches/transforms-2/files-2.1/55580b0ab45b69249933074462ab11c2/lifecycle-process-2.1.0/AndroidManifest.xml:27:13-40
+42    </application>
+43
+44</manifest>
