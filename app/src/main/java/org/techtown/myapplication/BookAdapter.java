@@ -1,10 +1,11 @@
 package org.techtown.myapplication;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,23 +15,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.Buffer;
-import java.security.spec.ECField;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.drawable.IconCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
@@ -51,9 +43,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static androidx.core.graphics.drawable.IconCompat.*;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
@@ -66,7 +55,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static MediaPlayer player;
     static HashMap<String, String> serverData;
     static String mood;
-    static String[] bookData;
+    static String[] bookData, moodData;
     static boolean complete = false;
     static String tempName;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
@@ -142,7 +131,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         if (!play) {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                             play = true;
-                            setPlayList(serverData.get("title_server"), 0);//TODO: set title
                             //if(complete){};
                             for (int i = 0; i < bookData.length; i++) {
                                 try {
@@ -150,26 +138,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     customtask2.execute(bookData[i]).get();
                                     System.out.println(bookData[i]);
                                     System.out.println(mood);
-                                    BackgoundSound backgoundSound = new BackgoundSound();
-                                    backgoundSound.execute(mood).get();
-                                    audioPlayer.start();
-
-                                    int duration = audioPlayer.getDuration();
-                                    try {
-                                        Thread.sleep(duration + 100);
-                                        player.pause();
-                                    } catch (InterruptedException e) {
-                                    }
-
-
+                                    moodData[i] = mood;
                                 } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-
-
                             }
+                            setPlayList(serverData.get("title_server"), 0, moodData[0]);
 
                         } else {
                             audioPlayer.pause();
+                            player.pause();
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
                             play = false;
                         }
@@ -196,6 +174,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         // String text ="안녕하세요" -> 파일에서 읽어와서 저장하는 거
                         //이때 서버 열어야함
                         bookData = (serverData.get("data")).split("\\$");
+                        moodData = new String[bookData.length];
 
                         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                             try {
@@ -375,137 +354,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
         }
 
-        private class BackgoundSound extends AsyncTask<String, Integer,Void>{
-            @Override
-            protected Void doInBackground(String... strings) {
-                // TODO Auto-generated method stub
-                Random random = new Random();
-                int randomValue = random.nextInt(3);
-                mood = strings[0];
-                if(mood.equals("1")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.n0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.n1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.n2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }else if(mood.equals("2")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.p0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.p1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.p2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }else if(mood.equals("3")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.m0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.m1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.m2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }
-                player.setVolume((float) 0.48,(float) 0.48);
-                player.start();
-                play = true;
-                return null;
-            }
-        }
-
-        private class BackgoundSound extends AsyncTask<String, Integer,Void>{
-            @Override
-            protected Void doInBackground(String... strings) {
-                // TODO Auto-generated method stub
-                Random random = new Random();
-                int randomValue = random.nextInt(3);
-                mood = strings[0];
-                if(mood.equals("1")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.n0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.n1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.n2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }else if(mood.equals("2")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.p0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.p1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.p2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }else if(mood.equals("3")){
-                    switch(randomValue){
-                        case 0:
-                            player = MediaPlayer.create(context, R.raw.m0);
-                            break;
-                        case 1:
-                            player = MediaPlayer.create(context, R.raw.m1);
-                            break;
-                        case 2:
-                            player = MediaPlayer.create(context, R.raw.m2);
-                            break;
-                        default:
-                            break;
-
-
-                    }
-                }
-                player.setVolume((float) 0.48,(float) 0.48);
-                player.start();
-                play = true;
-                return null;
-            }
-        }
-
-
-
-
-
-
         class CustomTask2 extends AsyncTask<String, Void, Void> {
             String sendMsg, receiveMsg;
 
@@ -584,24 +432,39 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         }
     }
 
-    public static void setPlayList(String t, int page) {
+    public static void setPlayList(String t, int page, String mood) {
         try {
+            int sound = background(mood);
             complete = false;
             cur_page = page;
             String tempName = t + page;
             String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";//TODO: set title
             Log.d("tag", path);
+            Resources resources = context.getResources();
+            Uri uri = new Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                    .authority(resources.getResourcePackageName(sound))
+                    .appendPath(resources.getResourceTypeName(sound))
+                    .appendPath(resources.getResourceEntryName(sound))
+                    .build();
             audioPlayer = new MediaPlayer();
+            player = new MediaPlayer();
             audioPlayer.setDataSource(path);
+            player.setDataSource(context, uri);
+            audioPlayer.setVolume((float)0.7,(float)0.7);
+            player.setVolume((float) 0.48, (float) 0.48);
             audioPlayer.prepare();
+            player.prepare();
             audioPlayer.start();
+            player.start();
             audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     audioPlayer.reset();
+                    player.reset();
                     cur_page++;
                     if (cur_page < bookData.length) {
-                        setPlayList(serverData.get("title_server"), cur_page);
+                        setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page]);
                     } else {
                         complete = true;
                         Log.d("status", Boolean.toString(complete));
@@ -611,5 +474,56 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static int background(String mood) {
+        Random random = new Random();
+        int sound = -1;
+        player = new MediaPlayer();
+        int randomValue = random.nextInt(3);
+        if (mood.equals("1")) {
+            switch (randomValue) {
+                case 0:
+                    sound = R.raw.n0;
+                    break;
+                case 1:
+                    sound = R.raw.n1;
+                    break;
+                case 2:
+                    sound = R.raw.n2;
+                    break;
+                default:
+                    break;
+            }
+        } else if (mood.equals("2")) {
+            switch (randomValue) {
+                case 0:
+                    sound = R.raw.n0;
+                    break;
+                case 1:
+                    sound = R.raw.n1;
+                    break;
+                case 2:
+                    sound = R.raw.n2;
+                    break;
+                default:
+                    break;
+            }
+        } else if (mood.equals("3")) {
+            switch (randomValue) {
+                case 0:
+                    sound = R.raw.n0;
+                    break;
+                case 1:
+                    sound = R.raw.n1;
+                    break;
+                case 2:
+                    sound = R.raw.n2;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return sound;
     }
 }
