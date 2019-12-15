@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -429,6 +430,68 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
         }
 
+        private class BackgoundSound extends AsyncTask<String, Integer,Void>{
+            @Override
+            protected Void doInBackground(String... strings) {
+                // TODO Auto-generated method stub
+                Random random = new Random();
+                int randomValue = random.nextInt(3);
+                mood = strings[0];
+                if(mood.equals("1")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.n0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.n1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.n2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }else if(mood.equals("2")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.p0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.p1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.p2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }else if(mood.equals("3")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.m0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.m1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.m2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }
+                player.setVolume((float) 0.48,(float) 0.48);
+                player.start();
+                play = true;
+                return null;
+            }
+        }
 
         class CustomTask2 extends AsyncTask<String, Void, Void> {
             String sendMsg, receiveMsg;
