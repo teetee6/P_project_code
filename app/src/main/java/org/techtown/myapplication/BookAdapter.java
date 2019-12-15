@@ -19,6 +19,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.nio.Buffer;
+import java.security.spec.ECField;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
@@ -63,6 +67,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static String mood;
     static String[] bookData;
     static boolean complete = false;
+    static String tempName;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
     static final String rabbit = "https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
@@ -144,63 +149,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     customtask2.execute(bookData[i]).get();
                                     System.out.println(bookData[i]);
                                     System.out.println(mood);
-                                    //random 사용해서 배경음악 선택
-                                    Random random = new Random();
-                                    int randomValue = random.nextInt(3);
-
-                                    if (mood.equals("1")) {
-                                        switch (randomValue) {
-                                            case 0:
-                                                player = MediaPlayer.create(context, R.raw.n0);
-                                                break;
-                                            case 1:
-                                                player = MediaPlayer.create(context, R.raw.n1);
-                                                break;
-                                            case 2:
-                                                player = MediaPlayer.create(context, R.raw.n2);
-                                                break;
-                                            default:
-                                                break;
-
-
-                                        }
-                                    } else if (mood.equals("2")) {
-                                        switch (randomValue) {
-                                            case 0:
-                                                player = MediaPlayer.create(context, R.raw.p0);
-                                                break;
-                                            case 1:
-                                                player = MediaPlayer.create(context, R.raw.p1);
-                                                break;
-                                            case 2:
-                                                player = MediaPlayer.create(context, R.raw.p2);
-                                                break;
-                                            default:
-                                                break;
-
-
-                                        }
-                                    } else if (mood.equals("3")) {
-                                        switch (randomValue) {
-                                            case 0:
-                                                player = MediaPlayer.create(context, R.raw.m0);
-                                                break;
-                                            case 1:
-                                                player = MediaPlayer.create(context, R.raw.m1);
-                                                break;
-                                            case 2:
-                                                player = MediaPlayer.create(context, R.raw.m2);
-                                                break;
-                                            default:
-                                                break;
-
-
-                                        }
-                                    }
-
-                                    player.start();
+                                    BackgoundSound backgoundSound = new BackgoundSound();
+                                    backgoundSound.execute(mood).get();
                                     audioPlayer.start();
-                                    play = true;
 
                                     int duration = audioPlayer.getDuration();
                                     try {
@@ -227,16 +178,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
 
-                   /* try {
-                        //for(int i =0; i<bookData.length; i++) {
-                            customtask2.execute(bookData[0]).get();
-                           // System.out.println(bookData[i]);
-                             System.out.println(mood);
-                            MediaPlayer player = MediaPlayer.create(context, R.raw.m2);
-                            player.start();
-                       // }
-                    }catch (Exception e){
-                    }*/
+
+                    Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
+
                 }
             });
 
@@ -294,8 +238,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         cView1.setBackgroundResource(0);
                         down = true;
                         //Log.d("tag","hey1");
-                        if (bookData.length > 0) {//set first page to ttsTask
-                            mTextString = new String[]{bookData[0]};
+                        String text =bookData[0];
+                        if(text.length()>0){
+                            mTextString = new String[]{text};
                             mttsTask = new ttsTask();
                             mttsTask.execute(mTextString);
                             curView = v;
@@ -404,8 +349,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             @Override
             protected Bitmap doInBackground(String... urls) {
                 // TODO Auto-generated method stub
-                try {
-                    URL myFileUrl = new URL("https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200");
+                try{
+                    URL myFileUrl = new URL(rabbit);
 
 
                     HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
@@ -428,6 +373,86 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
 
         }
+
+
+        private class BackgoundSound extends AsyncTask<String, Integer,Void>{
+
+
+
+            @Override
+            protected Void doInBackground(String... strings) {
+                // TODO Auto-generated method stub
+                Random random = new Random();
+                int randomValue = random.nextInt(3);
+                mood = strings[0];
+
+                if(mood.equals("1")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.n0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.n1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.n2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }else if(mood.equals("2")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.p0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.p1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.p2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }else if(mood.equals("3")){
+                    switch(randomValue){
+                        case 0:
+                            player = MediaPlayer.create(context, R.raw.m0);
+                            break;
+                        case 1:
+                            player = MediaPlayer.create(context, R.raw.m1);
+                            break;
+                        case 2:
+                            player = MediaPlayer.create(context, R.raw.m2);
+                            break;
+                        default:
+                            break;
+
+
+                    }
+                }
+                player.setVolume((float) 0.48,(float) 0.48);
+
+                player.start();
+
+                play = true;
+
+
+
+                return null;
+            }
+
+
+
+        }
+
+
+
+
 
 
         class CustomTask2 extends AsyncTask<String, Void, Void> {
