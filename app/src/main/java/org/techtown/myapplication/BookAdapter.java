@@ -9,6 +9,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -376,16 +377,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
 
         private class BackgoundSound extends AsyncTask<String, Integer,Void>{
-
-
-
             @Override
             protected Void doInBackground(String... strings) {
                 // TODO Auto-generated method stub
                 Random random = new Random();
                 int randomValue = random.nextInt(3);
                 mood = strings[0];
-
                 if(mood.equals("1")){
                     switch(randomValue){
                         case 0:
@@ -436,18 +433,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     }
                 }
                 player.setVolume((float) 0.48,(float) 0.48);
-
                 player.start();
-
                 play = true;
-
-
-
                 return null;
             }
-
-
-
         }
 
 
