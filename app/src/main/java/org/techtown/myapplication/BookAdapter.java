@@ -27,7 +27,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
@@ -144,7 +147,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             dbHelper = new DatabaseHelper(itemView.getContext());
             sqLiteDatabase = dbHelper.getWritableDatabase();
 
-            File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
+            File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");
             if(dir.exists()) {
                 down = true;
                 btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
@@ -206,13 +209,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         try {
                             CustomTask customtask = new CustomTask();
-                            serverData = customtask.execute("cat").get();//TODO: set server_title from bookItem
+                            serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
                             bookData = (serverData.get("data")).split("\\$");
                             moodData = new String[bookData.length];
 
                             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                                 try {
-                                    String tempName = serverData.get("title_server");
+                                    String tempName = "rabbit";
 
                                     File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
                                     if (!dir.exists()) {
@@ -221,12 +224,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     }
 
                                     //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
-                                    File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
+
+                                    Log.d("Tag", "rabbit/rabbit.txt 생성");  File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
                                     FileWriter fw = new FileWriter(f, false);
                                     fw.write(bookData.toString());
                                     fw.close();
                                     f.createNewFile();
-                                    Log.d("Tag", "rabbit/rabbit.txt 생성");
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -335,7 +338,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected HashMap doInBackground(String... strings) {
                 try {
                     String str;
-                    URL url = new URL("http://10.0.2.2:8080/gjavaweb/addrbook/server.jsp");
+                    URL url = new URL("http://192.168.0.2:8080/gjavaweb4/bookdata2.jsp");
 
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -379,12 +382,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 Log.d("Real_Real", "db생성됨");
                             }
 
-                            for(int i=1; serverData.containsKey("char"+i); i++ ) {
+                            for(int i=1; hashmap.containsKey("char"+i); i++ ) {
                                 sqLiteDatabase.execSQL(
                                         "insert into book(book_nation, book_name, book_char, book_nick)" +
-                                                "values ('local','rabbit_story', '"+ serverData.get("char"+i)+"' , '"+serverData.get("char"+i)+"' )"
-                                                + "WHERE book_char is NULL");
+                                                "values ('kor','rabbit_story', '"+ hashmap.get("char"+i)+"' , '"+hashmap.get("char"+i)+"' )"
+                                               );
                             }
+
+                            serverData=hashmap;
 
                             System.out.println(hashmap);
 
@@ -520,6 +525,23 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 items.add(new Nickname( serverData.get("char"+i) ) );
             }
 
+          /*  File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/rabbit/rabbit.txt");
+            try{
+
+                FileInputStream fis = new FileInputStream(f);
+                byte[] buffer = new byte[fis.available()];
+                fis.read(buffer);
+                fis.close();
+                String result = new String(buffer);
+                bookData = result.split("\\$");
+
+
+            }catch (Exception e){
+
+            }
+            */
+
+
             LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
             final View cccardview= inflater.inflate(R.layout.card_of_change_name, null);
             LinearLayout addcard = cccardview.findViewById(R.id.addCard);
@@ -551,9 +573,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 "book_nick!='" + serverData.get("char" + j) + "' "
                         , null);
                 int record_Count = cursor1.getCount();
+
                 if( record_Count == 1 ) {
                     cursor1.moveToNext();
-
+                    Log.d("tag","djfudj");
                     String book_nick = cursor1.getString(0);
                     row_nickname[i].setText(book_nick);
                     Log.d("Real_Real_최종최종//db반환값", book_nick);
@@ -634,6 +657,39 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     }
 
                     bookData = serverData.get("changed_data").split("\\$");
+
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                        try {
+                            String tempName = "rabbit";
+
+                            File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
+                            if (!dir.exists()) {
+                                dir.mkdirs();
+                                Log.d("Tag", "mkdirs");
+                            }
+
+                            //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
+
+                            Log.d("Tag", "rabbit/rabbit.txt 생성");  File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
+                            FileWriter fw = new FileWriter(f, false);
+                            fw.write(bookData.toString());
+                            fw.close();
+                            f.createNewFile();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        String text =bookData[0];
+                        if(text.length()>0){
+                            mTextString = new String[]{text};
+                            mttsTask = new ttsTask();
+                            mttsTask.execute(mTextString);
+
+                        } else {
+                            //empty text
+                        }
+                    }
+
                     for (String page : bookData) {
                         Log.d("Real_Real 변환된 배열값:", page);
                     }
@@ -744,7 +800,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             audioPlayer.setDataSource(path);
             player.setDataSource(context, uri);
             audioPlayer.setVolume((float)0.7,(float)0.7);
-            player.setVolume((float) 0.48, (float) 0.48);
+            player.setVolume((float) 0.3, (float) 0.3);
             audioPlayer.prepare();
             player.prepare();
             audioPlayer.start();
