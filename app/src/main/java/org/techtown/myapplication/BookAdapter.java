@@ -3,7 +3,10 @@ package org.techtown.myapplication;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,13 +19,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,7 +75,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static Bitmap bitmap = null;
     static final String rabbit = "https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
     static final String cat = "https://c8.alamy.com/comp/P9WXB1/nystrm-jenny-a-boy-and-a-cat-on-the-bench-on-a-sunny-day-P9WXB1.jpg";
-
+    static SQLiteDatabase sqLiteDatabase;
+    static DatabaseHelper dbHelper;
 
     public BookAdapter(List<BookItem> BookList, Context c) {
 
@@ -118,6 +128,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         private ttsTask mttsTask;
         String[] mTextString;
         View curView;
+        ArrayList<Nickname> items = new ArrayList<Nickname>();
+        public Button clear_button;
+        public Button save_button;
 
         OnItemClickListener listener;
 
@@ -128,6 +141,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             cView1 = (CardView) itemView.findViewById(R.id.cView1);
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
+            dbHelper = new DatabaseHelper(itemView.getContext());
+            sqLiteDatabase = dbHelper.getWritableDatabase();
 
             File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
             if(dir.exists()) {
@@ -250,6 +265,44 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     }
                 }
             });
+
+            cView1.setOnLongClickListener((new Button.OnLongClickListener() {
+                public boolean onLongClick(View v) {
+
+
+
+                    Cursor cursor = sqLiteDatabase.rawQuery(
+                            "select * from book", null);
+                    int recordCount = cursor.getCount();
+                    Log.d("Real_Real_db반환갯수", String.valueOf(recordCount));
+
+
+                    for (int i = 0; i < recordCount; i++) {
+                        cursor.moveToNext();
+
+                        int id = cursor.getInt(0);
+                        String book_nation = cursor.getString(1);
+                        String book_name = cursor.getString(2);
+                        String book_char = cursor.getString(3);
+                        String book_nick = cursor.getString(4);
+
+                        Log.d("Real_Real_db반환값", id + "  " + book_nation + "  " +book_name + "  " +book_char + "  " +book_nick);
+                    }
+
+
+
+                    Toast.makeText( itemView.getContext() , "만세" , Toast.LENGTH_SHORT).show();
+
+                    // serverData 해쉬함수의, "char1" "char2" "data" 에 맞춰,
+                    // "nick1" "nick2" (갯수만큼 동적생성됨) "changed_data" 가 생성됩니다.
+                    char_change_to_nick();
+
+
+
+                    return false;
+                }
+
+            }));
         }
 
         public void setOnItemClickListener(OnItemClickListener listener) {
@@ -319,6 +372,19 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             hashmap.put("title", title);
                             hashmap.put("title_server",title_server);
                             hashmap.put("type",type);
+
+                            if (sqLiteDatabase == null) {
+                                Log.d("Real_Real", "db생성안됨");
+                            } else {
+                                Log.d("Real_Real", "db생성됨");
+                            }
+
+                            for(int i=1; serverData.containsKey("char"+i); i++ ) {
+                                sqLiteDatabase.execSQL(
+                                        "insert into book(book_nation, book_name, book_char, book_nick)" +
+                                                "values ('local','rabbit_story', '"+ serverData.get("char"+i)+"' , '"+serverData.get("char"+i)+"' )"
+                                                + "WHERE book_char is NULL");
+                            }
 
                             System.out.println(hashmap);
 
@@ -445,6 +511,216 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
             }
+        }
+
+        private void char_change_to_nick() {
+
+            final String data = serverData.get( "data" );
+            for(int i=1; serverData.containsKey("char"+i); i++ ) {
+                items.add(new Nickname( serverData.get("char"+i) ) );
+            }
+
+            LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
+            final View cccardview= inflater.inflate(R.layout.card_of_change_name, null);
+            LinearLayout addcard = cccardview.findViewById(R.id.addCard);
+
+            int counting = items.size();
+
+            final TextView[] row_character = new TextView[counting];  // 동적 생성될 캐릭터 칸
+            final EditText[] row_nickname = new EditText[counting]; // 동적 생성될 닉네임 칸
+            for(int i=0; i<counting; i++ ) {
+                LinearLayout row_row_row = new LinearLayout(itemView.getContext());
+                row_row_row.setOrientation(LinearLayout.HORIZONTAL);
+
+                row_character[i] = new TextView(itemView.getContext());
+                row_character[i].setText( items.get(i).character );
+                row_row_row.addView(row_character[i]);
+
+                row_nickname[i] = new EditText(itemView.getContext());
+//                row_nickname[i].setHint("이곳에 입력하세요");
+                row_nickname[i].setHint("[ "+items.get(i).character+" ]");
+
+
+
+                Cursor cursor1;
+                int j = i+1;
+                cursor1 = sqLiteDatabase.rawQuery(" SELECT book_nick FROM book " +
+                                "WHERE " +
+                                "book_char='" + serverData.get("char" + j) + "' " +
+                                "AND " +
+                                "book_nick!='" + serverData.get("char" + j) + "' "
+                        , null);
+                int record_Count = cursor1.getCount();
+                if( record_Count == 1 ) {
+                    cursor1.moveToNext();
+
+                    String book_nick = cursor1.getString(0);
+                    row_nickname[i].setText(book_nick);
+                    Log.d("Real_Real_최종최종//db반환값", book_nick);
+                }
+
+                row_row_row.addView(row_nickname[i]);
+                addcard.addView(row_row_row);
+
+            }
+
+            AlertDialog.Builder builder= new AlertDialog.Builder(itemView.getContext()); //AlertDialog.Builder 객체 생성
+            builder.setTitle("동화속 캐릭터의 이름을 바꾸어봐요");
+            builder.setIcon(android.R.drawable.ic_menu_add);
+            builder.setView(cccardview);
+
+
+
+            Log.d("Real_Real_error--story", "tototo_1-5");
+
+            builder.setNeutralButton("돌아가기", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    if( serverData.containsKey("changed_data") ) {
+                        bookData = serverData.get("changed_data").split("\\$");
+                        for(String page : bookData) {
+                            Log.d("Real_Real 변환된 배열값:", page);
+                        }
+                    } else {
+                        serverData.put("changed_data", serverData.get("data"));
+                        bookData = serverData.get("changed_data").split("\\$");
+                        for(String page : bookData) {
+                            Log.d("Real_Real 변환된 배열값:", page);
+                        }
+                    }
+
+                    items.clear();
+                }
+            });
+
+            builder.setPositiveButton("저장 후 돌아가기", new DialogInterface.OnClickListener() {       // 돌아갈 땐, " serverData에 changed_data(변환된 문장)만 반환합니다 "
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // TODO Auto-generated method stub
+
+                    if( serverData.containsKey("changed_data") ) {
+                        serverData.remove("changed_data");  ////
+                    }
+
+
+                    for (int i = 0; i < items.size(); i++) {
+                        if (row_nickname[i].getText().toString().equals("")) { // 닉네임 입력칸을 비워뒀으면
+                            items.get(i).setNickname(row_character[i].getText().toString());  // 데이터객체의 닉네임 값에, 캐릭터 입력칸의 값 저장 // 캐릭터:tiger -> 닉네임:tiger
+                        } else {
+                            items.get(i).setNickname(row_nickname[i].getText().toString()); // 데이터객체의 닉네임 값에, 닉네임 입력칸의 값 저장  // 캐릭터:tiger -> 닉네임:trump
+                        }
+                        serverData.put("nick" + (i + 1), items.get(i).getNickname());
+                    }
+
+                    String s1 = "";
+                    String changed = data;
+
+                    for (int i = 0; i < items.size(); i++) {
+                        s1 = items.get(i).getCharacter();  // 데이터객체의 캐릭터 이름 한번씩 훑음
+                        if (data.contains(s1)) {        // 원문에서 캐릭터 이름이 있다면
+                            changed = changed.replace(s1, items.get(i).getNickname()); // 캐릭터 이름을 닉네임 이름으로 변환함.
+                        }
+                    }
+
+                    // 최종 변환된 문장은 changed 변수입니다.
+                    serverData.put("changed_data", changed);
+
+                    Log.d("Real_Real_error-bef_str", serverData.get("data"));
+                    Log.d("Real_Real_error-aft_str", serverData.get("changed_data"));
+
+                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    }
+
+                    bookData = serverData.get("changed_data").split("\\$");
+                    for (String page : bookData) {
+                        Log.d("Real_Real 변환된 배열값:", page);
+                    }
+
+                    items.clear();
+
+
+                }
+            });
+
+            save_button = cccardview.findViewById(R.id.save_button);
+            save_button.setOnClickListener(new View.OnClickListener() {         // 저장할 땐, " serverData의 char1, char2에 대응하는 nick1, nick2를 저장합니다."
+                @Override
+                public void onClick(View v) {
+
+
+                    for (int i = 0; i < items.size(); i++) {
+                        if ( row_nickname[i].getText().toString().equals("") ) { // 닉네임 입력칸을 비워뒀으면
+                            items.get(i).setNickname( row_character[i].getText().toString() );  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
+                        } else {
+                            items.get(i).setNickname( row_nickname[i].getText().toString() ); // 데이터객체에,  닉네임 입력칸의 값 저장  // tiger -> trump
+                        }
+                        serverData.put("nick"+(i+1), items.get(i).getNickname() );
+                    }
+
+                    String s1 = "";
+                    String changed = data;
+
+                    for (int i = 0; i < items.size(); i++) {
+                        s1 = items.get(i).getCharacter();  // 주인공이름 한번씩 훑음
+                        if (data.contains(s1)) {
+                            changed = changed.replace(s1, items.get(i).getNickname()); // i차 바뀐문장
+                        }
+                    }
+
+                    // 최종 변환된 문장은 changed 변수입니다.
+                    serverData.put("changed_data", changed);
+
+                    Log.d("Real_Real_error--story", "tototo_saved_button!");
+                    Log.d("Real_Real_error--char1:", serverData.get("char1"));
+                    Log.d("Real_Real_error--char2:", serverData.get("char2"));
+                    Log.d("Real_Real_error--nick1:", serverData.get("nick1"));
+                    Log.d("Real_Real_error--nick2:", serverData.get("nick2"));
+
+                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    }
+
+                }
+            });
+
+            clear_button = cccardview.findViewById(R.id.clear_button);
+            clear_button.setOnClickListener(new View.OnClickListener() {         // 초기화 땐, " serverData의 nick1, nick2에  기존 단어를 그대로 저장합니다."
+                @Override
+                public void onClick(View v) {
+
+                    for (int i = 0; i < items.size(); i++) {
+                        items.get(i).setNickname( row_character[i].getText().toString() );  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
+                        serverData.put("nick"+(i+1), items.get(i).getNickname() );
+                        row_nickname[i].setText("");
+                    }
+
+                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    }
+
+                    if( serverData.containsKey("changed_data") ) {
+                        serverData.remove("changed_data");  //다 초기화
+                    }
+
+                    Log.d("Real_Real_error--story", "tototo_clear_button!");
+                    Log.d("Real_Real_error--char1:", serverData.get("char1"));
+                    Log.d("Real_Real_error--char2:", serverData.get("char2"));
+                    Log.d("Real_Real_error--nick1:", serverData.get("nick1"));
+                    Log.d("Real_Real_error--nick2:", serverData.get("nick2"));
+
+                }
+            });
+
+
+            Log.d("Real_Real_error--story", "tototo_3");
+            AlertDialog dialog=builder.create();
+            dialog.setCanceledOnTouchOutside(false);    //없어지지 않도록 설정
+            dialog.show();
+            Log.d("Real_Real_error--story", "tototo_4");
+
+            return;
         }
     }
 
