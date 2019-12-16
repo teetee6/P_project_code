@@ -64,17 +64,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static ProgressBar progress;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
-    public BookAdapter(List<BookItem> BookList, Context c) {
 
+    public BookAdapter(List<BookItem> BookList, Context c) {
         mBookTempArray = BookList;
         this.context = c;
         activity = (Activity)c;
-
     }
 
     OnItemClickListener listener;
-
-    public static interface OnItemClickListener {
+    public static interface OnItemClickListener{
         public void onItemClick(ViewHolder holder, View view, int position);
     }
 
@@ -92,8 +90,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//img src setting
         holder.tBookTitle.setText(mBookTempArray.get(position).getName());
-
-        cur_num = position;
+        cur_num=mBookTempArray.get(position).getNum();
         holder.setOnItemClickListener(listener);
     }
 
@@ -124,7 +121,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             cView1 = (CardView) itemView.findViewById(R.id.cView1);
             btnPlay = (ImageButton) itemView.findViewById(R.id.btnPlay);
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
-
             File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
             if(dir.exists()) {
                 down = true;
@@ -161,16 +157,21 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
                             play = false;
                         }
-                        Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
-
                     } else {
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
 
 
-                    Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_LONG).show();
-
+                    Toast.makeText(v.getContext(), "position" + cur_num, Toast.LENGTH_SHORT).show();
+                    int position = getAdapterPosition();
+                    if(listener!=null){
+                        listener.onItemClick(ViewHolder.this, itemView, position);
+                        Toast.makeText(v.getContext(),"position: "+position,Toast.LENGTH_SHORT).show();
+                        cur_num = position;
+                        Log.d("tag","cur_num: "+cur_num);
+                    }
                 }
+
             });
 
             btnDown.setOnClickListener(new View.OnClickListener() {

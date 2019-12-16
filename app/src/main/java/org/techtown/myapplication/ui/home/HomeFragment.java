@@ -52,18 +52,25 @@ public class HomeFragment extends Fragment {
 
         mBookArray = new ArrayList<BookItem>();
 
-        for(int i=0;i<3;i++){
             BookItem item = new BookItem();
             item.setName("토끼와 거북이");//TODO: set programmatically
             item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
             item.setTitle_server("rabbit");//TODO: set programmatically
+            item.setNum(0);
             mBookArray.add(item);
-        }
+
+        item = new BookItem();
+        item.setName("토끼와 거북이2");//TODO: set programmatically
+        item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
+        item.setTitle_server("rabbit");//TODO: set programmatically
+        item.setNum(1);
+        mBookArray.add(item);
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rViewKorean.setLayoutManager(layoutManager);
         mBookAdapter = new BookAdapter(mBookArray,getActivity());
+        mBookAdapter.notifyDataSetChanged();
 
         rViewKorean.setAdapter(mBookAdapter);
         rViewKorean.setItemAnimator(new DefaultItemAnimator());
@@ -73,6 +80,7 @@ public class HomeFragment extends Fragment {
             public void onItemClick(BookAdapter.ViewHolder holder, View view, int position) {
                 BookItem item = BookAdapter.getItem(position);
                 CardView cv = (CardView) view.findViewById(R.id.cView1);
+                Toast.makeText(getActivity(),"p:"+position,Toast.LENGTH_SHORT).show();
             }
         });
     }
