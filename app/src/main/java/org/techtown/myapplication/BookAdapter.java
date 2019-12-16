@@ -116,8 +116,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView tBookTitle;
         public CardView cView1;
-        public ImageView bookImg;
         public ImageButton btnPlay, btnDown;
+        public ImageView bookImg;
         private ttsTask mttsTask;
         String[] mTextString;
         View curView;
@@ -136,11 +136,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             dbHelper = new DatabaseHelper(itemView.getContext());
             sqLiteDatabase = dbHelper.getWritableDatabase();
             File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
-            if(dir.exists()) {
+            if (dir.exists()) {
                 down = true;
                 btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
-            }
-            else
+            } else
                 down = false;
 
             btnPlay.setOnClickListener(new View.OnClickListener() {
@@ -151,7 +150,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         if (!play) {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                             play = true;
-                            //if(complete){};
                             for (int i = 0; i < bookData.length; i++) {
                                 try {
                                     CustomTask2 customtask2 = new CustomTask2();
@@ -163,7 +161,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     e.printStackTrace();
                                 }
                             }
-                            setPlayList(serverData.get("title_server"), 0, moodData[0]);
+                            setPlayList(serverData.get("title_server"), 0, moodData[0], btnPlay);
 
                         } else {
                             audioPlayer.pause();
@@ -175,11 +173,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
                     int position = getAdapterPosition();
-                    if(listener!=null){
+                    if (listener != null) {
                         listener.onItemClick(ViewHolder.this, itemView, position);
-                        Toast.makeText(v.getContext(),"position: "+position,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(v.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
                         cur_num = position;
-                        Log.d("tag","cur_num: "+cur_num);
+                        Log.d("tag", "cur_num: " + cur_num);
                     }
                 }
 
@@ -230,8 +228,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             e.printStackTrace();
                         }
 
-                        String text =bookData[0];
-                        if(text.length()>0){
+                        String text = bookData[0];
+                        if (text.length() > 0) {
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();
                             mttsTask.execute(mTextString);
@@ -243,15 +241,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
                         File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get this from bookItem
-                        if (dir.isDirectory())
-                        {
+                        if (dir.isDirectory()) {
                             String[] children = dir.list();
-                            for (int i = 0; i < children.length; i++)
-                            {
+                            for (int i = 0; i < children.length; i++) {
                                 new File(dir, children[i]).delete();
                             }
                             dir.delete();
-                            Log.d("tag","Successfully deleted whole file of "+"rabbit");
+                            Log.d("tag", "Successfully deleted whole file of " + "rabbit");
                         }
                     }
                 }
@@ -270,7 +266,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         String book_name = cursor.getString(2);
                         String book_char = cursor.getString(3);
                         String book_nick = cursor.getString(4);
-                        Log.d("Real_Real_db반환값", id + "  " + book_nation + "  " +book_name + "  " +book_char + "  " +book_nick);
+                        Log.d("Real_Real_db반환값", id + "  " + book_nation + "  " + book_name + "  " + book_char + "  " + book_nick);
                     }
                     // serverData 해쉬함수의, "char1" "char2" "data" 에 맞춰,
                     // "nick1" "nick2" (갯수만큼 동적생성됨) "changed_data" 가 생성됩니다.
@@ -289,7 +285,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             protected String doInBackground(String[]... strings) {//6 pages
                 for (int i = 0; i < bookData.length; i++) {
                     mTextString = new String[]{bookData[i]};//set next page
-                    TTSAPI.main(mTextString, serverData.get("title_server"), i, serverData.get("type"),curView);
+                    TTSAPI.main(mTextString, serverData.get("title_server"), i, serverData.get("type"), curView);
                 }
                 return null;
             }
@@ -346,9 +342,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             hashmap.put("char2", char2);
                             hashmap.put("data", data);
                             hashmap.put("title", title);
-                            hashmap.put("title_server",title_server);
-                            hashmap.put("type",type);
-                            hashmap.put("imgRsc",imgRsc);
+                            hashmap.put("title_server", title_server);
+                            hashmap.put("type", type);
+                            hashmap.put("imgRsc", imgRsc);
 
                             if (sqLiteDatabase == null) {
                                 Log.d("Real_Real", "db생성안됨");
@@ -356,14 +352,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 Log.d("Real_Real", "db생성됨");
                             }
 
-                            for(int i=1; hashmap.containsKey("char"+i); i++ ) {
+                            for (int i = 1; hashmap.containsKey("char" + i); i++) {
                                 sqLiteDatabase.execSQL(
                                         "insert into book(book_nation, book_name, book_char, book_nick)"
-                                                + "values ('kor','rabbit_story', '"+ hashmap.get("char"+i)+"' , '"+hashmap.get("char"+i)+"' )"
+                                                + "values ('kor','rabbit_story', '" + hashmap.get("char" + i) + "' , '" + hashmap.get("char" + i) + "' )"
                                 );
                             }
 
-                            serverData=hashmap;
+                            serverData = hashmap;
 
                             System.out.println(hashmap);
 
@@ -390,8 +386,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
             @Override
             protected Bitmap doInBackground(String... urls) {
-                try{
-                    URL myFileUrl = new URL(serverData.get("imgRsc").replace("\'",""));
+                try {
+                    URL myFileUrl = new URL(serverData.get("imgRsc").replace("\'", ""));
 
 
                     HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
@@ -492,29 +488,29 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
 
-        private void char_change_to_nick(){
-            final String data = serverData.get( "data" );
-            for(int i=1; serverData.containsKey("char"+i); i++ ) {
-                items.add(new Nickname( serverData.get("char"+i) ) );
+        private void char_change_to_nick() {
+            final String data = serverData.get("data");
+            for (int i = 1; serverData.containsKey("char" + i); i++) {
+                items.add(new Nickname(serverData.get("char" + i)));
             }
             LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
-            final View cccardview= inflater.inflate(R.layout.card_of_change_name, null);
+            final View cccardview = inflater.inflate(R.layout.card_of_change_name, null);
             LinearLayout addcard = cccardview.findViewById(R.id.addCard);
             int counting = items.size();
             final TextView[] row_character = new TextView[counting];  // 동적 생성될 캐릭터 칸
             final EditText[] row_nickname = new EditText[counting]; // 동적 생성될 닉네임 칸
-            for(int i=0; i<counting; i++ ) {
+            for (int i = 0; i < counting; i++) {
                 LinearLayout row_row_row = new LinearLayout(itemView.getContext());
                 row_row_row.setOrientation(LinearLayout.HORIZONTAL);
                 row_character[i] = new TextView(itemView.getContext());
-                row_character[i].setText( items.get(i).character );
+                row_character[i].setText(items.get(i).character);
                 row_row_row.addView(row_character[i]);
                 row_nickname[i] = new EditText(itemView.getContext());
 //                row_nickname[i].setHint("이곳에 입력하세요");
-                row_nickname[i].setHint("[ "+items.get(i).character+" ]");
+                row_nickname[i].setHint("[ " + items.get(i).character + " ]");
 
                 Cursor cursor1;
-                int j = i+1;
+                int j = i + 1;
                 cursor1 = sqLiteDatabase.rawQuery(" SELECT book_nick FROM book " +
                                 "WHERE " +
                                 "book_char='" + serverData.get("char" + j) + "' " +
@@ -523,10 +519,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         , null);
                 int record_Count = cursor1.getCount();
 
-                if( record_Count == 1 ) {
+                if (record_Count == 1) {
                     cursor1.moveToNext();
 
-                    Log.d("tag","djfudj");
+                    Log.d("tag", "djfudj");
                     String book_nick = cursor1.getString(0);
                     row_nickname[i].setText(book_nick);
                     Log.d("Real_Real_최종최종//db반환값", book_nick);
@@ -535,7 +531,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 addcard.addView(row_row_row);
             }
 
-            AlertDialog.Builder builder= new AlertDialog.Builder(itemView.getContext()); //AlertDialog.Builder 객체 생성
+            AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext()); //AlertDialog.Builder 객체 생성
             builder.setTitle("동화속 캐릭터의 이름을 바꾸어봐요");
             builder.setIcon(android.R.drawable.ic_menu_add);
             builder.setView(cccardview);
@@ -543,15 +539,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             builder.setNeutralButton("돌아가기", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if( serverData.containsKey("changed_data") ) {
+                    if (serverData.containsKey("changed_data")) {
                         bookData = serverData.get("changed_data").split("\\$");
-                        for(String page : bookData) {
+                        for (String page : bookData) {
                             Log.d("Real_Real 변환된 배열값:", page);
                         }
                     } else {
                         serverData.put("changed_data", serverData.get("data"));
                         bookData = serverData.get("changed_data").split("\\$");
-                        for(String page : bookData) {
+                        for (String page : bookData) {
                             Log.d("Real_Real 변환된 배열값:", page);
                         }
                     }
@@ -563,7 +559,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     // TODO Auto-generated method stub
-                    if( serverData.containsKey("changed_data") ) {
+                    if (serverData.containsKey("changed_data")) {
                         serverData.remove("changed_data");  ////
                     }
                     for (int i = 0; i < items.size(); i++) {
@@ -586,8 +582,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     serverData.put("changed_data", changed);
                     Log.d("Real_Real_error-bef_str", serverData.get("data"));
                     Log.d("Real_Real_error-aft_str", serverData.get("changed_data"));
-                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
-                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    for (int i = 1; serverData.containsKey("char" + i); i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='" + serverData.get("nick" + i) + "' WHERE book_char='" + serverData.get("char" + i) + "' ");
                     }
 
                     bookData = serverData.get("changed_data").split("\\$");
@@ -604,7 +600,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                             //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
 
-                            Log.d("Tag", "rabbit/rabbit.txt 생성");  File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
+                            Log.d("Tag", "rabbit/rabbit.txt 생성");
+                            File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
                             FileWriter fw = new FileWriter(f, false);
                             fw.write(bookData.toString());
                             fw.close();
@@ -613,8 +610,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             e.printStackTrace();
                         }
 
-                        String text =bookData[0];
-                        if(text.length()>0){
+                        String text = bookData[0];
+                        if (text.length() > 0) {
                             mTextString = new String[]{text};
                             mttsTask = new ttsTask();
                             mttsTask.execute(mTextString);
@@ -638,12 +635,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     for (int i = 0; i < items.size(); i++) {
-                        if ( row_nickname[i].getText().toString().equals("") ) { // 닉네임 입력칸을 비워뒀으면
-                            items.get(i).setNickname( row_character[i].getText().toString() );  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
+                        if (row_nickname[i].getText().toString().equals("")) { // 닉네임 입력칸을 비워뒀으면
+                            items.get(i).setNickname(row_character[i].getText().toString());  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
                         } else {
-                            items.get(i).setNickname( row_nickname[i].getText().toString() ); // 데이터객체에,  닉네임 입력칸의 값 저장  // tiger -> trump
+                            items.get(i).setNickname(row_nickname[i].getText().toString()); // 데이터객체에,  닉네임 입력칸의 값 저장  // tiger -> trump
                         }
-                        serverData.put("nick"+(i+1), items.get(i).getNickname() );
+                        serverData.put("nick" + (i + 1), items.get(i).getNickname());
                     }
                     String s1 = "";
                     String changed = data;
@@ -660,8 +657,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     Log.d("Real_Real_error--char2:", serverData.get("char2"));
                     Log.d("Real_Real_error--nick1:", serverData.get("nick1"));
                     Log.d("Real_Real_error--nick2:", serverData.get("nick2"));
-                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
-                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    for (int i = 1; serverData.containsKey("char" + i); i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='" + serverData.get("nick" + i) + "' WHERE book_char='" + serverData.get("char" + i) + "' ");
                     }
                 }
             });
@@ -670,14 +667,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     for (int i = 0; i < items.size(); i++) {
-                        items.get(i).setNickname( row_character[i].getText().toString() );  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
-                        serverData.put("nick"+(i+1), items.get(i).getNickname() );
+                        items.get(i).setNickname(row_character[i].getText().toString());  // 데이터객체에, 캐릭터 입력칸의 값 저장 // tiger -> tiger
+                        serverData.put("nick" + (i + 1), items.get(i).getNickname());
                         row_nickname[i].setText("");
                     }
-                    for (int i = 1; serverData.containsKey("char"+i) ; i++) {
-                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='"+ serverData.get("nick"+i) +"' WHERE book_char='"+ serverData.get("char"+i) +"' ");
+                    for (int i = 1; serverData.containsKey("char" + i); i++) {
+                        sqLiteDatabase.execSQL("UPDATE book SET book_nick='" + serverData.get("nick" + i) + "' WHERE book_char='" + serverData.get("char" + i) + "' ");
                     }
-                    if( serverData.containsKey("changed_data") ) {
+                    if (serverData.containsKey("changed_data")) {
                         serverData.remove("changed_data");  //다 초기화
                     }
                     Log.d("Real_Real_error--story", "tototo_clear_button!");
@@ -688,56 +685,57 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 }
             });
             Log.d("Real_Real_error--story", "tototo_3");
-            AlertDialog dialog=builder.create();
+            AlertDialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);    //없어지지 않도록 설정
             dialog.show();
             Log.d("Real_Real_error--story", "tototo_4");
             return;
         }
 
-    }
-
-    public static void setPlayList(String t, int page, String mood) {
-        try {
-            int sound = background(mood);
-            complete = false;
-            cur_page = page;
-            String tempName = t + page;
-            String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";
-            Log.d("tag", path);
-            Resources resources = context.getResources();
-            Uri uri = new Uri.Builder()
-                    .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-                    .authority(resources.getResourcePackageName(sound))
-                    .appendPath(resources.getResourceTypeName(sound))
-                    .appendPath(resources.getResourceEntryName(sound))
-                    .build();
-            audioPlayer = new MediaPlayer();
-            player = new MediaPlayer();
-            audioPlayer.setDataSource(path);
-            player.setDataSource(context, uri);
-            audioPlayer.setVolume((float)0.7,(float)0.7);
-            player.setVolume((float) 0.3, (float) 0.3);
-            audioPlayer.prepare();
-            player.prepare();
-            audioPlayer.start();
-            player.start();
-            audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    audioPlayer.reset();
-                    player.reset();
-                    cur_page++;
-                    if (cur_page < bookData.length) {
-                        setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page]);
-                    } else {
-                        complete = true;
-                        Log.d("status", Boolean.toString(complete));
+        public static void setPlayList(String t, int page, String mood, final ImageButton btn) {
+            try {
+                int sound = background(mood);
+                complete = false;
+                cur_page = page;
+                String tempName = t + page;
+                String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";
+                Log.d("tag", path);
+                Resources resources = context.getResources();
+                Uri uri = new Uri.Builder()
+                        .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                        .authority(resources.getResourcePackageName(sound))
+                        .appendPath(resources.getResourceTypeName(sound))
+                        .appendPath(resources.getResourceEntryName(sound))
+                        .build();
+                audioPlayer = new MediaPlayer();
+                player = new MediaPlayer();
+                audioPlayer.setDataSource(path);
+                player.setDataSource(context, uri);
+                audioPlayer.setVolume((float) 0.7, (float) 0.7);
+                player.setVolume((float) 0.3, (float) 0.3);
+                audioPlayer.prepare();
+                player.prepare();
+                audioPlayer.start();
+                player.start();
+                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        audioPlayer.reset();
+                        player.reset();
+                        cur_page++;
+                        if (cur_page < bookData.length) {
+                            setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page],btn);
+                        } else {
+                            complete = true;
+                            Log.d("status", Boolean.toString(complete));
+                            btn.setBackgroundResource(R.mipmap.ic_action_play_circle_filled);
+                            play = false;
+                        }
                     }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
