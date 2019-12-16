@@ -3,15 +3,7 @@ package org.techtown.myapplication;
 public class BookItem {
 
     private String name, title_server;
-    private  int imgSrc, num;
-
-    public int getNum(){
-        return num;
-    }
-
-    public void setNum(int num){
-        this.num = num;
-    }
+    private  int imgSrc;
 
     public String getName(){
         return name;
