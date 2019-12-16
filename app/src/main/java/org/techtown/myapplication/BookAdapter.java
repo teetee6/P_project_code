@@ -64,10 +64,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static ProgressBar progress;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
     static Bitmap bitmap = null;
-    static final String rabbit = "https://post-phinf.pstatic.net/MjAxNzA0MjNfMjAw/MDAxNDkyOTU3MjU4ODg1.gLkHHCf0BIWd2MtdwK324RVEdgLgCLuijrz1kq9nNIcg.BJnf1whFOJWSrhw4oWo8Sqs5XgZVq4rH4OJuLuFVm0wg.JPEG/01.JPG?type=w1200";
-    static final String cat = "https://c8.alamy.com/comp/P9WXB1/nystrm-jenny-a-boy-and-a-cat-on-the-bench-on-a-sunny-day-P9WXB1.jpg";
-
-
     public BookAdapter(List<BookItem> BookList, Context c) {
 
         mBookTempArray = BookList;
@@ -191,7 +187,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         try {
                             CustomTask customtask = new CustomTask();
-                            serverData = customtask.execute("cat").get();//TODO: set server_title from bookItem
+                            serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
                             bookData = (serverData.get("data")).split("\\$");
                             moodData = new String[bookData.length];
 
@@ -218,6 +214,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             }
 
                             imageBack task = new imageBack();
+                            task.execute();
                             task.execute().get();
                             //image가져오는 코드!
                         } catch (Exception e) {
@@ -311,6 +308,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             String title = jsonObject.getString("title");
                             String title_server = jsonObject.getString("title_server");
                             String type = jsonObject.getString("type");
+                            String imgRsc = jsonObject.getString("img");
 
                             hashmap = new HashMap<>();
                             hashmap.put("char1", char1);
@@ -319,6 +317,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             hashmap.put("title", title);
                             hashmap.put("title_server",title_server);
                             hashmap.put("type",type);
+                            hashmap.put("imgRsc",imgRsc);
 
                             System.out.println(hashmap);
 
@@ -346,7 +345,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             @Override
             protected Bitmap doInBackground(String... urls) {
                 try{
-                    URL myFileUrl = new URL(rabbit);
+                    URL myFileUrl = new URL(serverData.get("imgRsc").replace("\'",""));
 
 
                     HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
@@ -391,7 +390,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     try {
                         requestdata.put("apiId", "gachon.pproject.6728d71a1dc3c");
                         requestdata.put("apiKey", "ed13742e94834e339b70dc8a29a2142f");
-                        requestdata.put("lang", "kor");
+                        requestdata.put("lang", "kor");//TODO: set type programmatically
                         requestdata.put("reqText", sendMsg);
                         Log.d("error", "json");
 
