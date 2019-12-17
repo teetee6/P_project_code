@@ -134,6 +134,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         mBookImage.setRsc(serverDatas[position].get("imgRsc"));
         task.execute(mBookImage);
         Log.d("tag","server_img: "+serverDatas[position].get("imgRsc"));
+        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" +mBookTempArray.get(position).getTitle_server());//TODO: get title_server from bookItem
+        if (dir.exists()) {
+            down = true;
+            holder.btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
+        } else
+            down = false;
         holder.setOnItemClickListener(listener);
     }
 
@@ -168,12 +174,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
             dbHelper = new DatabaseHelper(itemView.getContext());
             sqLiteDatabase = dbHelper.getWritableDatabase();
-            File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
-            if (dir.exists()) {
-                down = true;
-                btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
-            } else
-                down = false;
 
             btnPlay.setOnClickListener(new View.OnClickListener() {
                 @Override
