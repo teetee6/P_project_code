@@ -68,7 +68,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static MediaPlayer player;
     static HashMap<String, String> serverData;
     static HashMap<String, String>[] serverDatas;
-    static String mood;
+    static String mood, lang;
     static String[] bookData, moodData;
     static boolean complete = false;
     static String tempName;
@@ -84,6 +84,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         List<BookItem> BookList;
         BookList = new ArrayList<BookItem>();
         try {
+            this.lang = lang;
             ViewHolder.CustomTask3 customTask3 = new ViewHolder.CustomTask3();
             serverDatas = customTask3.execute(lang).get();
             for (int i = 0; i < serverDatas.length; i++) {
@@ -229,14 +230,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         try {
                             CustomTask customtask = new CustomTask();
-                            serverData = customtask.execute(mBookTempArray.get(position).getTitle_server()).get();
+                            String tempName = mBookTempArray.get(position).getTitle_server();
+                            serverData = customtask.execute(tempName).get();
                             bookData = (serverData.get("data")).split("\\$");
                             moodData = new String[bookData.length];
 
                             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                                 try {
-                                    String tempName = "rabbit";//TODO: get this programmatically
-
                                     File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
                                     if (!dir.exists()) {
                                         dir.mkdirs();
@@ -271,7 +271,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     } else {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down = false;
-                        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get this from bookItem
+                        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
                         if (dir.isDirectory()) {
                             String[] children = dir.list();
                             for (int i = 0; i < children.length; i++) {
@@ -520,7 +520,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     try {
                         requestdata.put("apiId", R.string.apiId);
                         requestdata.put("apiKey", R.string.apiKey);
-                        requestdata.put("lang", "kor");//TODO: set type programmatically
+                        requestdata.put("lang", lang);
                         requestdata.put("reqText", sendMsg);
                         Log.d("error", "json");
 
@@ -646,7 +646,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             builder.setPositiveButton("저장 후 돌아가기", new DialogInterface.OnClickListener() {       // 돌아갈 땐, " serverData에 changed_data(변환된 문장)만 반환합니다 "
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // TODO Auto-generated method stub
                     if (serverData.containsKey("changed_data")) {
                         serverData.remove("changed_data");  ////
                     }
