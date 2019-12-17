@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/record_container"
+    >
+
+    <Button
+        android:id="@+id/record_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="녹음 시작" />
+
+    <Button
+        android:id="@+id/record_complt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="녹음 완료" />
+
+    <TextView
+        android:id="@+id/voice_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:id="@+id/record_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:srcCompat="@mipmap/ic_action_delete" />
+
+    <Button
+        android:id="@+id/return_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="돌아가기" />
+
+</LinearLayout>

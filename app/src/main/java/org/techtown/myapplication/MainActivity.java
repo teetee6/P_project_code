@@ -7,14 +7,23 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.viewpager.widget.ViewPager;
 
+import org.techtown.myapplication.ui.notifications.NotificationsFragment;
+import org.techtown.myapplication.ui.notifications.RecordingFragment;
+
 public class MainActivity extends AppCompatActivity {
-    @Override
+    NotificationsFragment notificationsFragment = new NotificationsFragment();
+    RecordingFragment recordingFragment = new RecordingFragment();
+
+   @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -27,5 +36,23 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+
+       FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+    }
+
+    public void onFragmentChanged(int index) {
+        if (index == 0) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, recordingFragment).commit();
+        } else if (index == 1) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, notificationsFragment).commit();
+        }
+    }
+
+    public void replaceFragment (Fragment f ){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction .replace(R.id.nav_host_fragment,f).commit();
     }
 }
+
