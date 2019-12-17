@@ -4,4 +4,6 @@
     <string name="title_English">영어 동화</string>
     <string name="title_My_Page">마이 페이지</string>
     <string name="book_title">sample title</string>
+    <string name="init">초기화</string>
+    <string name="save">저장</string>
 </resources>
