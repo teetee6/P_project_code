@@ -78,6 +78,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static Bitmap bitmap = null;
     static SQLiteDatabase sqLiteDatabase;
     static DatabaseHelper dbHelper;
+    BookImage mBookImage;
 
     public BookAdapter(Context c, String lang) {
         List<BookItem> BookList;
@@ -127,6 +128,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//img src setting
         holder.tBookTitle.setText(mBookTempArray.get(position).getName());
+        ViewHolder.imageBack task = new ViewHolder.imageBack();
+        mBookImage = new BookImage();
+        mBookImage.setView(holder);
+        mBookImage.setRsc(serverDatas[position].get("imgRsc"));
+        task.execute(mBookImage);
+        Log.d("tag","server_img: "+serverDatas[position].get("imgRsc"));
         holder.setOnItemClickListener(listener);
     }
 
@@ -143,8 +150,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         public TextView tBookTitle;
         public CardView cView1;
         public ImageButton btnPlay, btnDown;
-        public ImageView bookImg;
         private ttsTask mttsTask;
+        public ImageView bookImg;
         String[] mTextString;
         View curView;
         ArrayList<Nickname> items = new ArrayList<Nickname>();
@@ -246,9 +253,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     e.printStackTrace();
                                 }
                             }
-
-                            imageBack task = new imageBack();
-                            task.execute().get();
                             //image가져오는 코드!
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -468,15 +472,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
 
-        private class imageBack extends AsyncTask<String, Integer, Bitmap> {
-
-
+        private static class imageBack extends AsyncTask<BookImage, ViewHolder, BookImage> {
             @Override
-            protected Bitmap doInBackground(String... urls) {
+            protected BookImage doInBackground(BookImage... urls) {
                 try {
-                    URL myFileUrl = new URL(serverData.get("imgRsc").replace("\'", ""));
-
-
+                    URL myFileUrl = new URL(urls[0].getRsc());
                     HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
                     conn.setDoInput(true);
                     conn.connect();
@@ -484,16 +484,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     InputStream is = conn.getInputStream();
 
                     bitmap = BitmapFactory.decodeStream(is);
-
+                    urls[0].setBitmap(bitmap);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                return bitmap;
+                return urls[0];
             }
 
-            protected void onPostExecute(Bitmap img) {
-                bookImg.setImageBitmap(bitmap);
+            protected void onPostExecute(BookImage img) {
+                img.getView().bookImg.setImageBitmap(img.getBitmap());
             }
 
         }
