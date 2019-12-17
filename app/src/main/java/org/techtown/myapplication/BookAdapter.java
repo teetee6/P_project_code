@@ -69,10 +69,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static HashMap<String, String> serverData;
     static HashMap<String, String>[] serverDatas;
     static String mood, lang;
-    static int lang_lang;
+    static int length;
     static String[] bookData, moodData;
     static boolean complete = false;
-    static String tempName;
+    static String tempName, cur_mood="3";
     static Activity activity;
     static ProgressBar progress;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
@@ -86,10 +86,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         BookList = new ArrayList<BookItem>();
         try {
             this.lang = lang;
-            if(lang.equals("kor"))
-                lang_lang = 0;
-            else
-                lang_lang = 1;
             ViewHolder.CustomTask3 customTask3 = new ViewHolder.CustomTask3();
             serverDatas = customTask3.execute(lang).get();
             int length = serverDatas.length;
@@ -98,14 +94,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             for (int i = 0; i < serverDatas.length; i++) {
                 BookItem item = new BookItem();
                 item.setName(serverDatas[i].get("title"));
-                item.setImgSrc(serverDatas[i].get("imgRsc").replace("\'",""));
+                item.setImgSrc(serverDatas[i].get("imgRsc").replace("\'", ""));
                 item.setTitle_server(serverDatas[i].get("title_server"));
                 BookList.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(audioPlayer!=null&&player!=null){
+        if (audioPlayer != null && player != null) {
             audioPlayer.reset();
             player.reset();
         }
@@ -139,9 +135,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         mBookImage.setView(holder);
         mBookImage.setRsc(serverDatas[position].get("imgRsc"));
         task.execute(mBookImage);
-        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" +mBookTempArray.get(position).getTitle_server());
+        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + mBookTempArray.get(position).getTitle_server());
         if (dir.exists()) {
-            Log.d("tag","lang: "+lang_lang);
             down[position] = true;
             holder.btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
         } else
@@ -196,7 +191,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         if (!play[position]) {
                             btnPlay.setBackgroundResource(R.mipmap.ic_action_pause_circle_filled);
                             play[position] = true;
-                            if(bookData!=null) {
+                            if (bookData != null) {
                                 for (int i = 0; i < bookData.length; i++) {
                                     try {
                                         CustomTask2 customtask2 = new CustomTask2();
@@ -207,11 +202,26 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
+                                    cur_mood = moodData[0];
                                 }
-                                setPlayList(mBookTempArray.get(position).getTitle_server(), 0, moodData[0], btnPlay);
-                            }else{
-                                setPlayList(mBookTempArray.get(position).getTitle_server(), 0, "3", btnPlay);
+                            } else {
+                                cur_mood = "3";
                             }
+                            if(audioPlayer!=null&player!=null)
+                            {
+                                audioPlayer.start();
+                                player.start();
+                                audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                    @Override
+                                    public void onCompletion(MediaPlayer mp) {
+                                        player.reset();
+                                        setPlayList(mBookTempArray.get(cur_num).getTitle_server(),cur_page+1,cur_mood,btnPlay);
+
+                                    }
+                                });
+                            }
+                            else
+                                setPlayList(mBookTempArray.get(position).getTitle_server(), 0, cur_mood, btnPlay);
 
                         } else {
                             audioPlayer.pause();
@@ -453,7 +463,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         try {
                             JSONArray mJsonArray = new JSONArray(receiveMsg);
                             hashmaps = new HashMap[mJsonArray.length()];
-                            for(int i=0;i<mJsonArray.length();i++) {
+                            for (int i = 0; i < mJsonArray.length(); i++) {
                                 JSONObject jsonObject = mJsonArray.getJSONObject(i);
                                 String title = jsonObject.getString("title");
                                 String title_server = jsonObject.getString("title_server");
@@ -794,6 +804,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 complete = false;
                 cur_page = page;
                 String tempName = t + page;
+                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+t);
+                File[] files = f.listFiles();
+                length = files.length-1;
                 String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";
                 Log.d("tag", path);
                 Resources resources = context.getResources();
@@ -819,8 +832,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         audioPlayer.reset();
                         player.reset();
                         cur_page++;
-                        if (cur_page < bookData.length) {
-                            setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page], btn);
+                        if (cur_page < length) {
+                            if(moodData!=null)
+                                cur_mood = moodData[cur_page];
+                            setPlayList(mBookTempArray.get(cur_num).getTitle_server(), cur_page, cur_mood, btn);
                         } else {
                             complete = true;
                             Log.d("status", Boolean.toString(complete));
@@ -834,6 +849,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
     }
+
     private static int background(String mood) {
         Random random = new Random();
         int sound = -1;
