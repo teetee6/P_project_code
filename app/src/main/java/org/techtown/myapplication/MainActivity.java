@@ -1,5 +1,6 @@
 package org.techtown.myapplication;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -22,11 +23,13 @@ import org.techtown.myapplication.ui.notifications.RecordingFragment;
 public class MainActivity extends AppCompatActivity {
     NotificationsFragment notificationsFragment = new NotificationsFragment();
     RecordingFragment recordingFragment = new RecordingFragment();
+    private BackPressCloseHandler back;
 
    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+       back = new BackPressCloseHandler(this);
         final BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -53,6 +56,21 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction .replace(R.id.nav_host_fragment,f).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        back.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (Build.VERSION.SDK_INT >= 21)
+            finishAndRemoveTask();
+        else
+            finish();
+        System.exit(0);
     }
 }
 
