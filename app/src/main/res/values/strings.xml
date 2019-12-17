@@ -6,4 +6,9 @@
     <string name="book_title">sample title</string>
     <string name="init">초기화</string>
     <string name="save">저장</string>
+    <string name="v_add">목소리 추가</string>
+    <string name="r_start">녹음 시작</string>
+    <string name="r_complete">녹음 완료</string>
+    <string name="v_hint">화면에 나오는 \n 문장을 읽어주세요.</string>
+    <string name="back">돌아가기</string>
 </resources>

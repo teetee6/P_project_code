@@ -25,7 +25,7 @@ public class RecordingFragment extends Fragment {
 
     ViewGroup rootView;
     Handler mhandler;
-    String[] name = new String[]{"토끼가 어느날 나타났어요","호랑이가 기어가요","우루루쾅쾅"};
+    String[] name = new String[]{"토끼가 어느날 나타났어요","호랑이가 기어가요","우르르쾅쾅"};
 
 
 
@@ -48,7 +48,7 @@ public class RecordingFragment extends Fragment {
             public void onClick(View v) {
 
                 ImageView record_gif = (ImageView) rootView.findViewById(R.id.record_image);
-                Glide.with(getContext()).load(R.drawable.mic_loading).into(record_gif);
+                Glide.with(getContext()).load(R.drawable.voice_loading).into(record_gif);
                 setHandler(name, 0);
 
             }
@@ -82,8 +82,8 @@ public class RecordingFragment extends Fragment {
     }
 
     public void setHandler(String[] name,int key){
-       final  String[] n = name;
-       final int stop_key = key;
+        final  String[] n = name;
+        final int stop_key = key;
 
         mhandler = new Handler(){
             public void handleMessage(Message msg){
