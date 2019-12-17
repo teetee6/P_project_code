@@ -105,6 +105,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             audioPlayer.reset();
             player.reset();
             cur_page=0;
+            cur_num=0;
         }
         mBookTempArray = BookList;
         this.context = c;
@@ -184,7 +185,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     int position = getAdapterPosition();
                     if (listener != null) {
                         listener.onItemClick(ViewHolder.this, itemView, position);
-                        Toast.makeText(v.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(v.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
                         cur_num = position;
                         Log.d("tag", "cur_num: " + cur_num);
                     }
@@ -208,7 +209,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             } else {
                                 cur_mood = "3";
                             }
-                            if (audioPlayer != null & player != null) {
+                            if (audioPlayer != null && player != null) {
                                 audioPlayer.start();
                                 player.start();
                                 audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -231,6 +232,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     } else {
                         Toast.makeText(v.getContext(), "책을 먼저 다운로드 해주세요.", Toast.LENGTH_SHORT).show();
                     }
+                    Log.d("tag", Integer.toBinaryString(cur_page));
                 }
             });
 
@@ -286,6 +288,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             //empty text
                         }
                     } else {
+                        tempName = mBookTempArray.get(position).getTitle_server();
                         btnDown.setBackgroundResource(R.mipmap.ic_action_file_download);
                         down[position] = false;
                         File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + tempName);
@@ -295,6 +298,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 new File(dir, children[i]).delete();
                             }
                             dir.delete();
+                            Toast.makeText(v.getContext(),mBookTempArray.get(position).getName()+"(을)를 삭제하였습니다.",Toast.LENGTH_SHORT).show();
                             Log.d("tag", "Successfully deleted whole file of " + "rabbit");
                         }
                     }

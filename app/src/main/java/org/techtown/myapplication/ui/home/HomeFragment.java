@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
             public void onItemClick(BookAdapter.ViewHolder holder, View view, int position) {
                 BookItem item = BookAdapter.getItem(position);
                 CardView cv = (CardView) view.findViewById(R.id.cView1);
-                Toast.makeText(getActivity(),"p:"+position,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(),"p:"+position,Toast.LENGTH_SHORT).show();
             }
         });
     }
