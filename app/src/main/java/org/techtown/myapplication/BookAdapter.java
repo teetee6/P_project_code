@@ -134,7 +134,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         mBookImage.setRsc(serverDatas[position].get("imgRsc"));
         task.execute(mBookImage);
         Log.d("tag","server_img: "+serverDatas[position].get("imgRsc"));
-        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" +mBookTempArray.get(position).getTitle_server());//TODO: get title_server from bookItem
+        File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" +mBookTempArray.get(position).getTitle_server());
         if (dir.exists()) {
             down = true;
             holder.btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
@@ -220,6 +220,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     //get book file from server and put it in external storage
+                    int position = getAdapterPosition();
                     if (!down) {
                         btnDown.setBackgroundResource(R.mipmap.ic_action_delete);
                         down = true;
@@ -228,7 +229,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                         try {
                             CustomTask customtask = new CustomTask();
-                            serverData = customtask.execute("rabbit").get();//TODO: set server_title from bookItem
+                            serverData = customtask.execute(mBookTempArray.get(position).getTitle_server()).get();
                             bookData = (serverData.get("data")).split("\\$");
                             moodData = new String[bookData.length];
 

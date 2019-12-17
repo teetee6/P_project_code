@@ -43,16 +43,6 @@ public class DashboardFragment extends Fragment {
 
     private void dataInit(){
 
-        /*mBookArray = new ArrayList<BookItem>();
-
-        for(int i=0;i<3;i++){
-            BookItem item = new BookItem();
-            item.setName("Boy and Cat");//TODO: set programmatically
-            item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
-            item.setTitle_server("cat");//TODO: set programmatically
-            mBookArray.add(item);
-        }*/
-
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rViewEnglish.setLayoutManager(layoutManager);
