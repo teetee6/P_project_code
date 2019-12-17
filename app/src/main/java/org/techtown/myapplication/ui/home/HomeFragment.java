@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment {
 
     private void dataInit(){
 
-        mBookArray = new ArrayList<BookItem>();
+        /*mBookArray = new ArrayList<BookItem>();
 
             BookItem item = new BookItem();
             item.setName("토끼와 거북이");//TODO: set programmatically
@@ -62,12 +62,12 @@ public class HomeFragment extends Fragment {
         item.setName("토끼와 거북이2");//TODO: set programmatically
         item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
         item.setTitle_server("rabbit");//TODO: set programmatically
-        mBookArray.add(item);
+        mBookArray.add(item);*/
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rViewKorean.setLayoutManager(layoutManager);
-        mBookAdapter = new BookAdapter(mBookArray,getActivity());
+        mBookAdapter = new BookAdapter(getActivity(),"kor");
         mBookAdapter.notifyDataSetChanged();
 
         rViewKorean.setAdapter(mBookAdapter);

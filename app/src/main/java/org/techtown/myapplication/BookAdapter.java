@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONException;
@@ -76,7 +77,28 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static SQLiteDatabase sqLiteDatabase;
     static DatabaseHelper dbHelper;
 
-    public BookAdapter(List<BookItem> BookList, Context c) {
+    public BookAdapter( Context c, String lang) {
+
+        List<BookItem> BookList;
+        if(lang.equals("kor")){
+            BookList = new ArrayList<BookItem>();
+            BookItem item = new BookItem();
+            for(int i=0;i<;i++){
+                item.setName();
+                item.setImgSrc();
+                item.setTitle_server();
+                BookList.add(item);
+            }
+        }else{
+
+            BookList = new ArrayList<BookItem>();
+            BookItem item = new BookItem();
+            item.setName("boy and cat");//TODO: set programmatically
+            item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
+            item.setTitle_server("rabbit");//TODO: set programmatically
+            BookList.add(item);
+
+        }
         mBookTempArray = BookList;
         this.context = c;
         activity = (Activity)c;
@@ -135,6 +157,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
             dbHelper = new DatabaseHelper(itemView.getContext());
             sqLiteDatabase = dbHelper.getWritableDatabase();
+            try {
+                CustomTask customtask = new CustomTask();
+                serverData = customtask.execute("").get();
+            }catch (Exception e){
+
+            }
             File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
             if (dir.exists()) {
                 down = true;
