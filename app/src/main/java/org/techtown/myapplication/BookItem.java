@@ -2,8 +2,7 @@ package org.techtown.myapplication;
 
 public class BookItem {
 
-    private String name, title_server;
-    private  int imgSrc;
+    private String name, title_server, imgSrc;
 
     public String getName(){
         return name;
@@ -21,11 +20,11 @@ public class BookItem {
         this.title_server = title_server;
     }
 
-    public int getImgSrc(){
+    public String getImgSrc(){
         return imgSrc;
     }
 
-    public void setImgSrc(int imgSrc){
+    public void setImgSrc(String imgSrc){
         this.imgSrc = imgSrc;
     }
 

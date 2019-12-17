@@ -37,6 +37,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -66,6 +67,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static MediaPlayer audioPlayer = new MediaPlayer();
     static MediaPlayer player;
     static HashMap<String, String> serverData;
+    static HashMap<String, String>[] serverDatas;
     static String mood;
     static String[] bookData, moodData;
     static boolean complete = false;
@@ -77,35 +79,37 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static SQLiteDatabase sqLiteDatabase;
     static DatabaseHelper dbHelper;
 
-    public BookAdapter( Context c, String lang) {
-
+    public BookAdapter(Context c, String lang) {
         List<BookItem> BookList;
-        if(lang.equals("kor")){
-            BookList = new ArrayList<BookItem>();
-            BookItem item = new BookItem();
-            for(int i=0;i<;i++){
-                item.setName();
-                item.setImgSrc();
-                item.setTitle_server();
+        BookList = new ArrayList<BookItem>();
+        try {
+            ViewHolder.CustomTask3 customTask3 = new ViewHolder.CustomTask3();
+            serverDatas = customTask3.execute(lang).get();
+            for (int i = 0; i < serverDatas.length; i++) {
+                BookItem item = new BookItem();
+                item.setName(serverDatas[i].get("title"));
+                item.setImgSrc(serverDatas[i].get("imgRsc").replace("\'",""));
+                item.setTitle_server(serverDatas[i].get("title_server"));
                 BookList.add(item);
             }
-        }else{
-
-            BookList = new ArrayList<BookItem>();
-            BookItem item = new BookItem();
-            item.setName("boy and cat");//TODO: set programmatically
-            item.setImgSrc(R.mipmap.ic_action_crop_original); //TODO: set programmatically
-            item.setTitle_server("rabbit");//TODO: set programmatically
+        /*for (int i = 0; i <array.length; i++) {
+            item.setName(hashmap.get("title").toString());
+            item.setImgSrc(array[i].get("image").toString().replace("\'",""));
+            item.setTitle_server(array[i].get("title_server").toString());
             BookList.add(item);
-
+        }*/
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         mBookTempArray = BookList;
         this.context = c;
-        activity = (Activity)c;
+        activity = (Activity) c;
     }
 
     OnItemClickListener listener;
-    public static interface OnItemClickListener{
+
+    public static interface OnItemClickListener {
         public void onItemClick(ViewHolder holder, View view, int position);
     }
 
@@ -157,12 +161,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             btnDown = (ImageButton) itemView.findViewById(R.id.btnDown);
             dbHelper = new DatabaseHelper(itemView.getContext());
             sqLiteDatabase = dbHelper.getWritableDatabase();
-            try {
-                CustomTask customtask = new CustomTask();
-                serverData = customtask.execute("").get();
-            }catch (Exception e){
-
-            }
             File dir = new File(Environment.getExternalStorageDirectory() + "/TTS/" + "rabbit");//TODO: get title_server from bookItem
             if (dir.exists()) {
                 down = true;
@@ -326,7 +324,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             }
         }
 
-        class CustomTask extends AsyncTask<String, Void, HashMap> {
+        private static class CustomTask extends AsyncTask<String, Void, HashMap> {
             String sendMsg, receiveMsg;
             HashMap<String, String> hashmap;
 
@@ -406,6 +404,67 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     e.printStackTrace();
                 }
                 return hashmap;
+            }
+        }
+
+        private static class CustomTask3 extends AsyncTask<String, Void, HashMap[]> {
+            String sendMsg, receiveMsg;
+            HashMap<String, String>[] hashmaps;
+
+            @Override
+            protected HashMap[] doInBackground(String... strings) {
+                try {
+                    String str;
+                    URL url = new URL("http://10.0.2.2:8080/gjavaweb/addrbook/server.jsp");
+
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                    conn.setRequestMethod("POST");
+                    OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
+                    sendMsg = "type=" + strings[0];
+                    osw.write(sendMsg);
+                    osw.flush();
+                    if (conn.getResponseCode() == conn.HTTP_OK) {
+                        InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                        BufferedReader reader = new BufferedReader(tmp);
+                        StringBuffer buffer = new StringBuffer();
+                        while ((str = reader.readLine()) != null) {
+
+                            buffer.append(str);
+                        }
+                        receiveMsg = buffer.toString();
+                        Document doc = Jsoup.parse(receiveMsg);
+                        System.out.println(doc.text());
+                        receiveMsg = doc.text();
+                        try {
+                            JSONArray mJsonArray = new JSONArray(receiveMsg);
+                            hashmaps = new HashMap[mJsonArray.length()];
+                            for(int i=0;i<mJsonArray.length();i++) {
+                                JSONObject jsonObject = mJsonArray.getJSONObject(i);
+                                String title = jsonObject.getString("title");
+                                String title_server = jsonObject.getString("title_server");
+                                String imgRsc = jsonObject.getString("image");
+
+                                hashmaps[i] = new HashMap<>();
+                                hashmaps[i].put("title", title);
+                                hashmaps[i].put("title_server", title_server);
+                                hashmaps[i].put("imgRsc", imgRsc);
+                            }
+                            serverDatas = hashmaps;
+
+                        } catch (Exception e) {
+                            Log.d("tag", "못읽어옴");
+                        }
+                    } else {
+                        Log.i("통신 결과", conn.getResponseCode() + "에러");
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return hashmaps;
             }
         }
 
@@ -752,7 +811,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         player.reset();
                         cur_page++;
                         if (cur_page < bookData.length) {
-                            setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page],btn);
+                            setPlayList(serverData.get("title_server"), cur_page, moodData[cur_page], btn);
                         } else {
                             complete = true;
                             Log.d("status", Boolean.toString(complete));
