@@ -60,7 +60,7 @@ public class RecordingFragment extends Fragment {
             public void onClick(View v) {
 
                 ImageView record_gif = (ImageView) rootView.findViewById(R.id.record_image);
-                Glide.with(getContext()).load(R.drawable.smile).into(record_gif);
+                Glide.with(getContext()).load(R.drawable.complete).into(record_gif);
                 setHandler(name, 1);
 
             }
