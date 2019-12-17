@@ -11,5 +11,4 @@
     <string name="r_complete">녹음 완료</string>
     <string name="v_hint">화면에 나오는 \n 문장을 읽어주세요.</string>
     <string name="back">돌아가기</string>
-    <string name="change_nick">주인공 이름 변경</string>
 </resources>
