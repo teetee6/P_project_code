@@ -6,4 +6,5 @@
     <string name="book_title">sample title</string>
     <string name="init">초기화</string>
     <string name="save">저장</string>
+    <string name="change_nick">주인공 이름 변경</string>
 </resources>

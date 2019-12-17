@@ -1,6 +1,7 @@
 package org.techtown.myapplication;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -72,7 +73,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     static int length;
     static String[] bookData, moodData;
     static boolean complete = false;
-    static String tempName, cur_mood="3";
+    static String tempName, cur_mood = "3";
     static Activity activity;
     static ProgressBar progress;
     //패턴 기분 : 긍적적 : 2 부정적 : 1 걍 그럼 :3
@@ -207,20 +208,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             } else {
                                 cur_mood = "3";
                             }
-                            if(audioPlayer!=null&player!=null)
-                            {
+                            if (audioPlayer != null & player != null) {
                                 audioPlayer.start();
                                 player.start();
                                 audioPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                     @Override
                                     public void onCompletion(MediaPlayer mp) {
                                         player.reset();
-                                        setPlayList(mBookTempArray.get(cur_num).getTitle_server(),cur_page+1,cur_mood,btnPlay);
+                                        setPlayList(mBookTempArray.get(cur_num).getTitle_server(), cur_page + 1, cur_mood, btnPlay);
 
                                     }
                                 });
-                            }
-                            else
+                            } else
                                 setPlayList(mBookTempArray.get(position).getTitle_server(), 0, cur_mood, btnPlay);
 
                         } else {
@@ -603,6 +602,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             LayoutInflater inflater = LayoutInflater.from(itemView.getContext());
             final View cccardview = inflater.inflate(R.layout.card_of_change_name, null);
             LinearLayout addcard = cccardview.findViewById(R.id.addCard);
+            LinearLayout.LayoutParams plControl = (LinearLayout.LayoutParams) addcard.getLayoutParams();
+            plControl.leftMargin = 30;
+            plControl.rightMargin = 30;
             int counting = items.size();
             final TextView[] row_character = new TextView[counting];  // 동적 생성될 캐릭터 칸
             final EditText[] row_nickname = new EditText[counting]; // 동적 생성될 닉네임 칸
@@ -615,7 +617,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 row_nickname[i] = new EditText(itemView.getContext());
 //                row_nickname[i].setHint("이곳에 입력하세요");
                 row_nickname[i].setHint("[ " + items.get(i).character + " ]");
-
+                row_nickname[i].setLayoutParams(plControl);
                 Cursor cursor1;
                 int j = i + 1;
                 cursor1 = sqLiteDatabase.rawQuery(" SELECT book_nick FROM book " +
@@ -638,9 +640,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 addcard.addView(row_row_row);
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext()); //AlertDialog.Builder 객체 생성
-            builder.setTitle("동화속 캐릭터의 이름을 바꾸어봐요");
-            builder.setIcon(android.R.drawable.ic_menu_add);
+            AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext(), R.style.alert); //AlertDialog.Builder 객체 생성
+            builder.setTitle(R.string.change_nick);
+            builder.setIcon(R.drawable.ic_add);
             builder.setView(cccardview);
             Log.d("Real_Real_error--story", "tototo_1-5");
             builder.setNeutralButton("돌아가기", new DialogInterface.OnClickListener() {
@@ -793,6 +795,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             Log.d("Real_Real_error--story", "tototo_3");
             AlertDialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);    //없어지지 않도록 설정
+            //ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) addcard.getLayoutParams(); lp.setMarginEnd(30);
             dialog.show();
             Log.d("Real_Real_error--story", "tototo_4");
             return;
@@ -804,9 +807,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 complete = false;
                 cur_page = page;
                 String tempName = t + page;
-                File f = new File(Environment.getExternalStorageDirectory()+File.separator+"TTS/"+t);
+                File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t);
                 File[] files = f.listFiles();
-                length = files.length-1;
+                length = files.length - 1;
                 String path = Environment.getExternalStorageDirectory() + File.separator + "TTS/" + t + "/" + tempName + ".mp4";
                 Log.d("tag", path);
                 Resources resources = context.getResources();
@@ -833,7 +836,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                         player.reset();
                         cur_page++;
                         if (cur_page < length) {
-                            if(moodData!=null)
+                            if (moodData != null)
                                 cur_mood = moodData[cur_page];
                             setPlayList(mBookTempArray.get(cur_num).getTitle_server(), cur_page, cur_mood, btn);
                         } else {
