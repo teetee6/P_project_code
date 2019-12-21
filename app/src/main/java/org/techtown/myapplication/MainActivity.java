@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, recordingFragment).commit();
         } else if (index == 1) {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, notificationsFragment).commit();
+        }else if(index ==2){
         }
     }
 

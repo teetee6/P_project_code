@@ -185,7 +185,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     int position = getAdapterPosition();
                     if (listener != null) {
                         listener.onItemClick(ViewHolder.this, itemView, position);
-                        //Toast.makeText(v.getContext(), "position: " + position, Toast.LENGTH_SHORT).show();
                         cur_num = position;
                         Log.d("tag", "cur_num: " + cur_num);
                     }
@@ -262,7 +261,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                         Log.d("Tag", "mkdirs");
                                     }
 
-                                    //여기 나중에 로직으로 변경해야함 어떤 책인지에 따라서
                                     Log.d("Tag", "rabbit/rabbit.txt 생성");
                                     File f = new File(Environment.getExternalStorageDirectory() + File.separator + "TTS/" + tempName + "/" + tempName + ".txt");
                                     FileWriter fw = new FileWriter(f, false);
@@ -273,7 +271,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                     e.printStackTrace();
                                 }
                             }
-                            //image가져오는 코드!
+                            for (int i = 0; i < bookData.length; i++) {
+                                try {
+                                    CustomTask2 customtask2 = new CustomTask2();
+                                    customtask2.execute(bookData[i]).get();
+                                    System.out.println(bookData[i]);
+                                    System.out.println(mood);
+                                    moodData[i] = mood;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                cur_mood = moodData[0];
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -299,7 +308,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             }
                             dir.delete();
                             Toast.makeText(v.getContext(),mBookTempArray.get(position).getName()+"(을)를 삭제하였습니다.",Toast.LENGTH_SHORT).show();
-                            Log.d("tag", "Successfully deleted whole file of " + "rabbit");
+                            Log.d("tag", "Successfully deleted whole file of " + mBookTempArray.get(position).getName());
                         }
                     }
                 }
@@ -399,9 +408,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             hashmap.put("imgRsc", imgRsc);
 
                             if (sqLiteDatabase == null) {
-                                Log.d("Real_Real", "db생성안됨");
+                                Log.d("Real_Real", "db 생성 안됨");
                             } else {
-                                Log.d("Real_Real", "db생성됨");
+                                Log.d("Real_Real", "db 생성 됨");
                             }
 
                             for (int i = 1; hashmap.containsKey("char" + i); i++) {
@@ -411,12 +420,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 );
                             }
 
-                            serverData = hashmap;
+                           serverData = hashmap;
 
                             System.out.println(hashmap);
 
                         } catch (Exception e) {
-                            Log.d("tag", "못읽어옴");
+                            Log.d("tag", "못읽어옴읽1");
 
 
                         }
@@ -429,6 +438,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                System.out.println("diq"+hashmap);
                 return hashmap;
             }
         }
@@ -471,7 +481,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                                 String title_server = jsonObject.getString("title_server");
                                 String imgRsc = jsonObject.getString("image");
 
-                                hashmaps[i] = new HashMap<>();
+                                hashmaps[i] = new HashMap<String, String>();
                                 hashmaps[i].put("title", title);
                                 hashmaps[i].put("title_server", title_server);
                                 hashmaps[i].put("imgRsc", imgRsc);
@@ -479,7 +489,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                             serverDatas = hashmaps;
 
                         } catch (Exception e) {
-                            Log.d("tag", "못읽어옴");
+                            Log.d("tag", "못읽어옴2");
                         }
                     } else {
                         Log.i("통신 결과", conn.getResponseCode() + "에러");
@@ -528,8 +538,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 try {
                     String str;
                     URL url = new URL("https://dev-api.maum.ai/api/hmd/");
-
-
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     Log.d("error", " conn");
                     conn.setRequestProperty("Content-Type", "application/json");
@@ -537,11 +545,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                     OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
                     JSONObject requestdata = new JSONObject();
                     Log.d("error", "json object");
-                    sendMsg = strings[0];
+                    sendMsg = "type="+strings[0];
                     try {
                         requestdata.put("apiId", R.string.apiId);
                         requestdata.put("apiKey", R.string.apiKey);
-                        requestdata.put("lang", lang);
+                        requestdata.put("lang", "kor");
                         requestdata.put("reqText", sendMsg);
                         Log.d("error", "json");
 
@@ -633,11 +641,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
                 if (record_Count == 1) {
                     cursor1.moveToNext();
-
-                    Log.d("tag", "djfudj");
                     String book_nick = cursor1.getString(0);
                     row_nickname[i].setText(book_nick);
-                    Log.d("Real_Real_최종최종//db반환값", book_nick);
                 }
                 row_row_row.addView(row_nickname[i]);
                 addcard.addView(row_row_row);
@@ -826,7 +831,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 audioPlayer.setDataSource(path);
                 player.setDataSource(context, uri);
                 audioPlayer.setVolume((float) 0.7, (float) 0.7);
-                player.setVolume((float) 0.3, (float) 0.3);
+                player.setVolume((float) 0.2, (float) 0.2);
                 audioPlayer.prepare();
                 player.prepare();
                 audioPlayer.start();
@@ -863,13 +868,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         if (mood.equals("1")) {
             switch (randomValue) {
                 case 0:
-                    sound = R.raw.n0;
+                    sound = R.raw.p0;
                     break;
                 case 1:
-                    sound = R.raw.n1;
+                    sound = R.raw.p1;
                     break;
                 case 2:
-                    sound = R.raw.n2;
+                    sound = R.raw.p2;
                     break;
                 default:
                     break;
@@ -891,13 +896,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         } else if (mood.equals("3")) {
             switch (randomValue) {
                 case 0:
-                    sound = R.raw.n0;
+                    sound = R.raw.m0;
                     break;
                 case 1:
-                    sound = R.raw.n1;
+                    sound = R.raw.m1;
                     break;
                 case 2:
-                    sound = R.raw.n2;
+                    sound = R.raw.m2;
                     break;
                 default:
                     break;
